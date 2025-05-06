@@ -96,7 +96,7 @@ Finally the file containing the test case and metadata should be placed in `test
 
 ## Supported tools
 
-### Parser
+### Parse/Lint
 - [x] [slang](https://github.com/MikePopoloski/slang)
 - [x] [surelog](https://github.com/chipsalliance/Surelog)
 - [x] [sv-parser](https://github.com/dalance/sv-parser)
@@ -111,7 +111,7 @@ Finally the file containing the test case and metadata should be placed in `test
 
 ## Silimate new tools (closed-source)
 
-### Parser
+### Parse/Lint
 - [ ] [verific](https://github.com/silimate/verific)
 
 ### Synthesis
