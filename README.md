@@ -96,16 +96,39 @@ Finally the file containing the test case and metadata should be placed in `test
 
 ## Supported tools
 
-* [Yosys](https://github.com/yosysHQ/yosys)
-* [Odin II](https://verilogtorouting.org)
-* [Verilator](https://verilator.org)
-* [Icarus](http://iverilog.icarus.com)
-* [slang](https://github.com/MikePopoloski/slang)
-* [sv2v(zachjs)](https://github.com/zachjs/sv2v)
-* [tree-sitter-systemverilog](https://github.com/gmlarumbe/tree-sitter-systemverilog)
-* [tree-sitter-verilog](https://github.com/tree-sitter/tree-sitter-verilog)
-* [sv-parser](https://github.com/dalance/sv-parser)
-* [moore](http://llhd.io)
-* [verible](https://github.com/google/verible)
-* [circt-verilog](https://github.com/llvm/circt)
-* [yosys-slang](https://github.com/povik/yosys-slang)
+### Parser
+- [x] [slang](https://github.com/MikePopoloski/slang)
+- [x] [surelog](https://github.com/chipsalliance/Surelog)
+- [x] [sv-parser](https://github.com/dalance/sv-parser)
+- [x] [tree-sitter-systemverilog](https://github.com/gmlarumbe/tree-sitter-systemverilog)
+- [x] [verible](https://github.com/google/verible)
+
+### Synthesis
+- [x] [sv2v](https://github.com/zachjs/sv2v)
+- [x] [synlig](https://github.com/chipsalliance/synlig)
+- [ ] [yosys](https://github.com/silimate/yosys)
+- [ ] [yosys-slang](https://github.com/povik/yosys-slang)
+
+## Silimate new tools (closed-source)
+
+### Parser
+- [ ] [verific](https://github.com/silimate/verific)
+
+### Synthesis
+- [ ] [preqorsor](https://github.com/silimate/preqorsor)
+- [ ] [yosys-verific](https://github.com/silimate/yosys)
+
+## Silimate removed tools
+
+### Parser
+* ~~[tree-sitter-verilog](https://github.com/tree-sitter/tree-sitter-verilog)~~
+
+### Simulator
+* ~~[iverilog](https://github.com/steveicarus/iverilog.git)~~
+* ~~[verilator](https://github.com/verilator/verilator)~~
+* ~~[verilator-uhdm](https://github.com/antmicro/verilator)~~
+
+### Other
+* ~~[odin_ii](https://github.com/verilog-to-routing/vtr-verilog-to-routing.git)~~
+* ~~[circt-verilog](https://github.com/llvm/circt)~~
+* ~~[moore](http://llhd.io)~~
