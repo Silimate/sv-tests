@@ -108,17 +108,17 @@ Finally the file containing the test case and metadata should be placed in `test
 - [x] [sv2v](https://github.com/zachjs/sv2v)
 - [x] [synlig](https://github.com/chipsalliance/synlig)
 - [ ] [yosys](https://github.com/silimate/yosys)
-- [ ] [yosys-slang](https://github.com/povik/yosys-slang)
+- [x] [yosys-slang](https://github.com/povik/yosys-slang)
 
 ### Simulation
-- [ ] [iverilog](https://github.com/steveicarus/iverilog.git)
-- [ ] [verilator](https://github.com/verilator/verilator)
-- [ ] [verilator-uhdm](https://github.com/antmicro/verilator)
+- [x] [iverilog](https://github.com/steveicarus/iverilog.git)
+- [x] [verilator](https://github.com/verilator/verilator)
+- [x] [verilator-uhdm](https://github.com/antmicro/verilator)
 
 ### Other
-- [ ] [odin_ii](https://github.com/verilog-to-routing/vtr-verilog-to-routing.git)
-- [ ] [circt-verilog](https://github.com/llvm/circt)
-- [ ] [moore](http://llhd.io)
+- [x] [odin_ii](https://github.com/verilog-to-routing/vtr-verilog-to-routing.git)
+- [x] [circt-verilog](https://github.com/llvm/circt)
+- [x] [moore](http://llhd.io)
 
 ## Supported closed-source tools
 
