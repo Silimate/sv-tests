@@ -6,7 +6,7 @@ export CURRENT_PATH=$PWD
 set -ex
 
 git clone \
-  git@github.com:chipsalliance/sv-tests-results.git \
+  git@github.com:silimate/sv-tests-results.git \
   --single-branch \
   --depth 1 \
   --branch gh-pages \
@@ -25,8 +25,8 @@ Deploy $GITHUB_REF (build $GITHUB_RUN_ID)
 Build from $GITHUB_SHA
 EOF
 
-git config user.name "SymbiFlow Robot"
-git config user.email "foss-fpga-tools@google.com"
+git config user.name "Silimate Robot"
+git config user.email "sv-tests@silimate.com"
 
 git commit -F $GIT_MESSAGE_FILE
 
