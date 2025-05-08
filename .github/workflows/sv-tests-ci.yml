@@ -71,7 +71,7 @@ jobs:
     name: ${{ matrix.tool.name }}
     runs-on: [ubuntu-latest]
     # runs-on: [self-hosted, Linux, X64, gcp-custom-runners]
-    container: ubuntu:jammy-20221130
+    container: ubuntu:latest
     steps:
       - name: Cancel previous
         uses: styfle/cancel-workflow-action@0.8.0
@@ -101,9 +101,6 @@ jobs:
           update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
           pip install --upgrade setuptools
           pip install -r conf/requirements.txt
-      - name: Find
-        run: |
-          find
       - name: Install VeeR dependencies
         run: |
           apt install -y cpanminus
@@ -198,7 +195,7 @@ jobs:
     name: Summary
     runs-on: [ubuntu-latest]
     # runs-on: [self-hosted, Linux, X64, gcp-custom-runners]
-    container: ubuntu:jammy-20221130
+    container: ubuntu:latest
     needs: Run
     env:
       ANALYZER: "$PWD/tools/report_analyzer.py"
