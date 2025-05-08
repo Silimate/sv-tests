@@ -99,28 +99,18 @@ Finally the file containing the test case and metadata should be placed in `test
 ### Parsing/Linting
 - [x] [slang](https://github.com/MikePopoloski/slang)
 - [x] [surelog](https://github.com/chipsalliance/Surelog)
-- [x] [sv-parser](https://github.com/dalance/sv-parser)
-- [x] [tree-sitter-verilog](https://github.com/tree-sitter/tree-sitter-verilog)
-- [x] [tree-sitter-systemverilog](https://github.com/gmlarumbe/tree-sitter-systemverilog)
 - [x] [verible](https://github.com/google/verible)
 
 ### Synthesis
-- [x] [sv2v](https://github.com/zachjs/sv2v)
 - [x] [synlig](https://github.com/chipsalliance/synlig)
-- [ ] [yosys](https://github.com/silimate/yosys)
+- [x] [yosys](https://github.com/silimate/yosys)
 - [x] [yosys-slang](https://github.com/povik/yosys-slang)
 
 ### Simulation
 - [x] [iverilog](https://github.com/steveicarus/iverilog.git)
 - [x] [verilator](https://github.com/verilator/verilator)
-- [x] [verilator-uhdm](https://github.com/antmicro/verilator)
 
-### Other
-- [x] [odin_ii](https://github.com/verilog-to-routing/vtr-verilog-to-routing.git)
-- [x] [circt-verilog](https://github.com/llvm/circt)
-- [x] [moore](http://llhd.io)
-
-## Supported closed-source tools
+## Supported closed-source tools (TODO)
 
 ### Parse/Lint
 - [ ] [verific](https://github.com/silimate/verific)
@@ -128,3 +118,21 @@ Finally the file containing the test case and metadata should be placed in `test
 ### Synthesis
 - [ ] [preqorsor](https://github.com/silimate/preqorsor)
 - [ ] [yosys-verific](https://github.com/silimate/yosys)
+
+## Removed open-source tools
+
+### Parsing/Linting
+- ~~[sv-parser](https://github.com/dalance/sv-parser)~~
+- ~~[tree-sitter-verilog](https://github.com/tree-sitter/tree-sitter-verilog)~~
+- ~~[tree-sitter-systemverilog](https://github.com/gmlarumbe/tree-sitter-systemverilog)~~
+
+### Synthesis
+- ~~[sv2v](https://github.com/zachjs/sv2v)~~
+
+### Simulation
+- ~~[verilator-uhdm](https://github.com/antmicro/verilator)~~
+
+### Other
+- ~~[odin_ii](https://github.com/verilog-to-routing/vtr-verilog-to-routing.git)~~
+- ~~[circt-verilog](https://github.com/llvm/circt)~~
+- ~~[moore](http://llhd.io)~~
