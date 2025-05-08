@@ -102,7 +102,7 @@ jobs:
           apt install -y cpanminus
           cpanm Bit::Vector JSON
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
       - name: Install ccache
         if: ${{ !matrix.tool.skip-ccache }}
         run: |
@@ -218,9 +218,7 @@ jobs:
           apt install -y cpanminus
           cpanm Bit::Vector JSON
       - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          submodules: true
+        uses: actions/checkout@v2
       - name: Prepare output directories
         run: |
           mkdir -p out/report
