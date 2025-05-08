@@ -188,8 +188,6 @@ jobs:
       GRAPHER: "$PWD/tools/history-graph"
       OUT_REPORT_DIR: "$PWD/out/report/"
       COMPARE_REPORT: "$OUT_REPORT_DIR/report.csv"
-      REPORTS_HISTORY: "$(mktemp -d --suffix='.history')"
-      BASE_REPORT: "$REPORTS_HISTORY/report.csv"
       CHANGES_SUMMARY_JSON: "$OUT_REPORT_DIR/tests_summary.json"
       CHANGES_SUMMARY_MD: "$OUT_REPORT_DIR/tests_summary.md"
       TESTS_SUMMARY_DIR: "tests_summary/"

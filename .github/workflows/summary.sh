@@ -3,7 +3,9 @@ set -euxo pipefail
 set -x
 set -e
 
-#environment variables for this file are set in sv-tests-ci.yml
+# Environment variables for this file are now set here
+export REPORTS_HISTORY=$(mktemp -d --suffix='.history')
+export BASE_REPORT="$REPORTS_HISTORY/report.csv"
 
 # Get base report from sv-tests master run
 git clone https://github.com/silimate/sv-tests-results.git --depth 120 $REPORTS_HISTORY
