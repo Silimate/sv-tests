@@ -19,8 +19,8 @@
 [submodule "third_party/tools/slang"]
 	path = third_party/tools/slang
 	url = https://github.com/MikePopoloski/slang.git
-[submodule "third-party/yosys"]
-	path = third-party/yosys
+[submodule "third-party/tools/yosys"]
+	path = third-party/tools/yosys
 	url = https://github.com/YosysHQ/yosys.git
 [submodule "third_party/tools/zachjs-sv2v"]
 	path = third_party/tools/zachjs-sv2v
