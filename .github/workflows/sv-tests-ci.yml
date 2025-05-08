@@ -82,9 +82,6 @@ jobs:
           echo "$SHELL"
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Git status
-        run: |
-          git status
       - name: Update apt repos
         run: |
           apt-get update -qq
@@ -104,6 +101,9 @@ jobs:
           update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
           pip install --upgrade setuptools
           pip install -r conf/requirements.txt
+      - name: Git status
+        run: |
+          git status
       - name: Install VeeR dependencies
         run: |
           apt install -y cpanminus
