@@ -25,6 +25,7 @@ jobs:
           #   deps: cmake default-jre pkg-config tclsh uuid-dev
           - name: verible
             deps: bazel=7.6.1 bison flex libfl-dev
+            runners_filter: Verible
             skip-ccache: 1
           - name: verilator
             deps: autoconf autotools-dev bison flex help2man libfl-dev libelf-dev
