@@ -85,7 +85,10 @@ jobs:
           apt-get update -qq
           apt install -y git
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+      - name: Fix git safe directory
+        run: |
+          git config --global --add safe.directory ${{ github.workspace }}
       - name: Add bazel repo (if needed)
         if: ${{ contains(matrix.tool.deps, 'bazel') }}
         run: |
@@ -214,7 +217,10 @@ jobs:
           apt-get update -qq
           apt install -y git
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+      - name: Fix git safe directory
+        run: |
+          git config --global --add safe.directory ${{ github.workspace }}
       - name: Setup python
         run: |
           apt-get update -qq
