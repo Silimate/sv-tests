@@ -80,10 +80,6 @@ jobs:
       - name: Show shell
         run: |
           echo "$SHELL"
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          submodules: true
       - name: Update apt repos
         run: |
           apt-get update -qq
@@ -105,6 +101,8 @@ jobs:
         run: |
           apt install -y cpanminus
           cpanm Bit::Vector JSON
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Install ccache
         if: ${{ !matrix.tool.skip-ccache }}
         run: |
@@ -126,26 +124,26 @@ jobs:
         if: ${{ contains(matrix.tool.deps, 'haskell') }}
         run: |
           stack upgrade
-      # - name: Checkout the tool submodule
-      #   run: |
-      #     # Github dropped support for unauthorized git: https://github.blog/2021-09-01-improving-git-protocol-security-github/
-      #     # Make sure we always use https:// instead of git://
-      #     git config --global url.https://github.com/.insteadOf git://github.com/
-      #     # take verilator from github (some tested tools still use a submodule
-      #     # from veripool)
-      #     git config --global url."https://github.com/verilator/verilator".insteadOf http://git.veripool.org/git/verilator
-      #     REPOSITORY_NAME=${{ matrix.tool.name }}
-      #     if [[ ! -z "${{ matrix.tool.repo }}" ]]; then
-      #       REPOSITORY_NAME=${{ matrix.tool.repo }}
-      #     fi
-      #     git submodule update --init --depth 1 third_party/tools/${REPOSITORY_NAME}
-      #     if [[ ! -z "${{ matrix.tool.submodules }}" ]]; then
-      #       pushd third_party/tools/${REPOSITORY_NAME}
-      #       git submodule update --init --recursive --depth 1 ${{ matrix.tool.submodules }}
-      #       popd
-      #     fi
-      #     # yosys tool contains tests, is a dependency of other tools
-      #     git submodule update --init --recursive --depth 1 third_party/tools/yosys
+      - name: Checkout the tool submodule
+        run: |
+          # Github dropped support for unauthorized git: https://github.blog/2021-09-01-improving-git-protocol-security-github/
+          # Make sure we always use https:// instead of git://
+          git config --global url.https://github.com/.insteadOf git://github.com/
+          # take verilator from github (some tested tools still use a submodule
+          # from veripool)
+          git config --global url."https://github.com/verilator/verilator".insteadOf http://git.veripool.org/git/verilator
+          REPOSITORY_NAME=${{ matrix.tool.name }}
+          if [[ ! -z "${{ matrix.tool.repo }}" ]]; then
+            REPOSITORY_NAME=${{ matrix.tool.repo }}
+          fi
+          git submodule update --init --depth 1 third_party/tools/${REPOSITORY_NAME}
+          if [[ ! -z "${{ matrix.tool.submodules }}" ]]; then
+            pushd third_party/tools/${REPOSITORY_NAME}
+            git submodule update --init --recursive --depth 1 ${{ matrix.tool.submodules }}
+            popd
+          fi
+          # yosys tool contains tests, is a dependency of other tools
+          git submodule update --init --recursive --depth 1 third_party/tools/yosys
       - name: Create Cache Timestamp
         id: cache_timestamp
         uses: nanzm/get-time-action@v1.1
@@ -209,10 +207,6 @@ jobs:
       TESTS_SUMMARY_DIR: "tests_summary/"
       DEBIAN_FRONTEND: "noninteractive"
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          submodules: true
       - name: Setup python
         run: |
           apt-get update -qq
@@ -223,6 +217,10 @@ jobs:
         run: |
           apt install -y cpanminus
           cpanm Bit::Vector JSON
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Prepare output directories
         run: |
           mkdir -p out/report
@@ -232,14 +230,14 @@ jobs:
       - name: Extract
         run: |
           for file in $(find out/ -name *.tar -print); do tar -xf $file --strip-components=2 -C $(dirname $file); done
-      # - name: Checkout third party tests and cores
-      #   run: |
-      #     # take verilator from github
-      #     git config --global url."https://github.com/verilator/verilator".insteadOf http://git.veripool.org/git/verilator
-      #     git submodule update --init --recursive --depth 1 third_party/tests
-      #     git submodule update --init --recursive --depth 1 third_party/cores
-      #     # yosys tool also contains tests
-      #     git submodule update --init --recursive --depth 1 third_party/tools/yosys
+      - name: Checkout third party tests and cores
+        run: |
+          # take verilator from github
+          git config --global url."https://github.com/verilator/verilator".insteadOf http://git.veripool.org/git/verilator
+          git submodule update --init --recursive --depth 1 third_party/tests
+          git submodule update --init --recursive --depth 1 third_party/cores
+          # yosys tool also contains tests
+          git submodule update --init --recursive --depth 1 third_party/tools/yosys
       - name: Summary
         run: |
           ./.github/workflows/summary.sh
