@@ -184,12 +184,12 @@ jobs:
     container: ubuntu:latest
     needs: Run
     env:
-      ANALYZER: "$PWD/tools/report_analyzer.py"
-      GRAPHER: "$PWD/tools/history-graph"
-      OUT_REPORT_DIR: "$PWD/out/report/"
-      COMPARE_REPORT: "$OUT_REPORT_DIR/report.csv"
-      CHANGES_SUMMARY_JSON: "$OUT_REPORT_DIR/tests_summary.json"
-      CHANGES_SUMMARY_MD: "$OUT_REPORT_DIR/tests_summary.md"
+      ANALYZER: "./tools/report_analyzer.py"
+      GRAPHER: "./tools/history-graph"
+      OUT_REPORT_DIR: "./out/report/"
+      COMPARE_REPORT: "./out/report/report.csv"
+      CHANGES_SUMMARY_JSON: "./out/report/tests_summary.json"
+      CHANGES_SUMMARY_MD: "./out/report/tests_summary.md"
       TESTS_SUMMARY_DIR: "tests_summary/"
       DEBIAN_FRONTEND: "noninteractive"
     steps:
