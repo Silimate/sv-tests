@@ -19,9 +19,6 @@
 [submodule "third_party/tools/slang"]
 	path = third_party/tools/slang
 	url = https://github.com/MikePopoloski/slang.git
-[submodule "third_party/tools/yosys"]
-	path = third_party/tools/yosys
-	url = git@github.com:Silimate/yosys.git
 [submodule "third_party/tools/zachjs-sv2v"]
 	path = third_party/tools/zachjs-sv2v
 	url = https://github.com/zachjs/sv2v
@@ -108,6 +105,6 @@
 	path = third_party/tools/circt-verilog
 	url = https://github.com/llvm/circt.git
 	branch = main
-[submodule "third_party/tools/verific"]
-	path = third_party/tools/verific
-	url = git@github.com:Silimate/verific.git
+[submodule "third-party/yosys"]
+	path = third-party/yosys
+	url = https://github.com/YosysHQ/yosys.git
