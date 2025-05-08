@@ -21,10 +21,10 @@ cat $(find ./out/report_* -name "*.csv" -print) >> $COMPARE_REPORT
 # Insert header at the first line of concatenated report
 sed -i 1i\ $(head -1 $(find ./out/report_* -name "*.csv.backup" -print -quit)) $COMPARE_REPORT
 
-python $ANALYZER $COMPARE_REPORT $BASE_REPORT -o $CHANGES_SUMMARY_JSON -t $CHANGES_SUMMARY_MD
+python3 $ANALYZER $COMPARE_REPORT $BASE_REPORT -o $CHANGES_SUMMARY_JSON -t $CHANGES_SUMMARY_MD
 
 # generate history graph
-python $GRAPHER -n 120 -r $REPORTS_HISTORY
+python3 $GRAPHER -n 120 -r $REPORTS_HISTORY
 
 set +e
 set +x
