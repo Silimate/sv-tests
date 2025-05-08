@@ -46,6 +46,9 @@ jobs:
           #   runners_filter: UhdmVerilator
           - name: yosys
             deps: bison clang tcl-dev flex libfl-dev pkg-config libreadline-dev
+          - name: yosys-slang
+            deps: bison clang tcl-dev flex libfl-dev pkg-config libreadline-dev cmake pkg-config
+            submodules: third_party/slang
           - name: yosys-synlig
             repo: synlig
             submodules: third_party/yosys third_party/surelog
@@ -53,9 +56,6 @@ jobs:
             runners_filter: SynligYosys
           - name: zachjs-sv2v
             deps: haskell-stack
-          - name: yosys-slang
-            deps: bison clang tcl-dev flex libfl-dev pkg-config libreadline-dev cmake pkg-config
-            submodules: third_party/slang
           # - name: circt-verilog
           #   deps: cmake clang ninja-build lld
           #   submodules: llvm
