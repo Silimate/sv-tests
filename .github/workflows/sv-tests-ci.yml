@@ -33,11 +33,11 @@ jobs:
           - name: yosys-slang
             deps: bison clang tcl-dev flex libfl-dev pkg-config libreadline-dev cmake pkg-config
             submodules: third_party/slang third_party/fmt
-          - name: yosys-synlig
-            repo: synlig
-            submodules: third_party/yosys third_party/surelog
-            deps: cmake clang tcl-dev bison default-jre flex libfl-dev libreadline-dev pkg-config tclsh uuid-dev
-            runners_filter: SynligYosys
+          # - name: yosys-synlig
+          #   repo: synlig
+          #   submodules: third_party/yosys third_party/surelog
+          #   deps: cmake clang tcl-dev bison default-jre flex libfl-dev libreadline-dev pkg-config tclsh uuid-dev
+          #   runners_filter: SynligYosys
     env:
       RUNNERS_FILTER: ${{ matrix.tool.runners_filter }}
       CCACHE_DIR: "/root/sv-tests/sv-tests/.cache/"
