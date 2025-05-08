@@ -101,9 +101,9 @@ jobs:
           update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
           pip install --upgrade setuptools
           pip install -r conf/requirements.txt
-      - name: Git status
+      - name: Find
         run: |
-          git status
+          find
       - name: Install VeeR dependencies
         run: |
           apt install -y cpanminus
