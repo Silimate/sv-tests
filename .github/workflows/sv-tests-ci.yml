@@ -97,8 +97,8 @@ jobs:
       - name: Install common dependencies
         run: |
           apt install -y python3 python3-pip git wget file
-          pip install --upgrade setuptools
-          pip install -r conf/requirements.txt
+          pip install --break-system-packages --upgrade setuptools
+          pip install --break-system-packages -r conf/requirements.txt
       - name: Install VeeR dependencies
         run: |
           apt install -y cpanminus
@@ -213,8 +213,8 @@ jobs:
         run: |
           apt-get update -qq
           apt install -y python3 python3-pip wget git curl jq
-          pip install --upgrade setuptools
-          pip install -r conf/requirements.txt
+          pip install --break-system-packages --upgrade setuptools
+          pip install --break-system-packages -r conf/requirements.txt
       - name: Install VeeR dependencies
         run: |
           apt install -y cpanminus
