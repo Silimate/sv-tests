@@ -130,7 +130,6 @@ $(RDIR)/moore/Cargo.lock: $(CDIR)/runners/Cargo.lock
 verible:
 	cd $(RDIR)/verible/ && bazel build :install-binaries --noshow_progress --//bazel:use_local_flex_bison -c opt
 	cd $(RDIR)/verible/ && .github/bin/simple-install.sh $(INSTALL_DIR)/bin
-	cd $(RDIR)/verible/ && bazel shutdown
 
 $(INSTALL_DIR)/bin/verible-verilog-kythe-extractor: verible
 

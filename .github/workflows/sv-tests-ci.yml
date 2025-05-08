@@ -52,10 +52,10 @@ jobs:
     # runs-on: [self-hosted, Linux, X64, gcp-custom-runners]
     container: ubuntu:latest
     steps:
-      - name: Cancel previous
-        uses: styfle/cancel-workflow-action@0.8.0
-        with:
-          access_token: ${{ github.token }}
+      # - name: Cancel previous
+      #   uses: styfle/cancel-workflow-action@0.8.0
+      #   with:
+      #     access_token: ${{ github.token }}
       - name: Show shell
         run: |
           echo "$SHELL"
@@ -145,6 +145,7 @@ jobs:
           key: cache_${{ matrix.tool.name }}_${{ steps.cache_timestamp.outputs.time }}
           restore-keys: cache_${{ matrix.tool.name }}_
       - name: Build
+        shell: bash
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           [[ -f $HOME/.cargo/env ]] && source $HOME/.cargo/env
