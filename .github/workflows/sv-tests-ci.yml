@@ -82,6 +82,9 @@ jobs:
           echo "$SHELL"
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Git status
+        run: |
+          git status
       - name: Update apt repos
         run: |
           apt-get update -qq
@@ -127,7 +130,6 @@ jobs:
         run: |
           stack upgrade
       - name: Checkout the tool submodule
-        shell: bash
         run: |
           # Github dropped support for unauthorized git: https://github.blog/2021-09-01-improving-git-protocol-security-github/
           # Make sure we always use https:// instead of git://

@@ -19,6 +19,9 @@
 [submodule "third_party/tools/slang"]
 	path = third_party/tools/slang
 	url = https://github.com/MikePopoloski/slang.git
+[submodule "third-party/yosys"]
+	path = third-party/yosys
+	url = https://github.com/YosysHQ/yosys.git
 [submodule "third_party/tools/zachjs-sv2v"]
 	path = third_party/tools/zachjs-sv2v
 	url = https://github.com/zachjs/sv2v
@@ -105,6 +108,3 @@
 	path = third_party/tools/circt-verilog
 	url = https://github.com/llvm/circt.git
 	branch = main
-[submodule "third-party/yosys"]
-	path = third-party/yosys
-	url = https://github.com/YosysHQ/yosys.git
