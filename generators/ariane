@@ -105,6 +105,9 @@ while (components := next(ver_cmd_comp_iter, False)):
         if 'axi2apb_wrap.sv' not in args and args not in sources:
             sources.append(os.path.join(ariane_path, args))
 
+# Override top module
+top_module = "cva6"
+
 os.chdir(main_path)
 test_dir = os.path.join(tests_dir, 'generated', tests_subdir)
 
