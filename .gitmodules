@@ -7,9 +7,6 @@
 [submodule "third_party/cores/ariane"]
 	path = third_party/cores/ariane
 	url = https://github.com/pulp-platform/ariane
-[submodule "third_party/tools/odin_ii"]
-	path = third_party/tools/odin_ii
-	url = https://github.com/verilog-to-routing/vtr-verilog-to-routing.git
 [submodule "third_party/tools/icarus"]
 	path = third_party/tools/icarus
 	url = https://github.com/steveicarus/iverilog.git
@@ -22,9 +19,6 @@
 [submodule "third_party/tools/yosys"]
 	path = third_party/tools/yosys
 	url = https://github.com/YosysHQ/yosys.git
-[submodule "third_party/tools/zachjs-sv2v"]
-	path = third_party/tools/zachjs-sv2v
-	url = https://github.com/zachjs/sv2v
 [submodule "third_party/cores/veer-eh1"]
 	path = third_party/cores/veer-eh1
 	url = https://github.com/chipsalliance/Cores-VeeR-EH1
@@ -40,9 +34,6 @@
 [submodule "third_party/cores/fx68k"]
 	path = third_party/cores/fx68k
 	url = https://github.com/ijor/fx68k
-[submodule "third_party/tools/sv-parser"]
-	path = third_party/tools/sv-parser
-	url = https://github.com/dalance/sv-parser
 [submodule "third_party/cores/scr1"]
 	path = third_party/cores/scr1
 	url = https://github.com/syntacore/scr1
@@ -86,12 +77,6 @@
 [submodule "third_party/tests/projf-explore"]
 	path = third_party/tests/projf-explore
 	url = https://github.com/projf/projf-explore.git
-[submodule "third_party/tools/verilator-uhdm"]
-	path = third_party/tools/verilator-uhdm
-	url = https://github.com/antmicro/verilator
-[submodule "third_party/tools/moore"]
-	path = third_party/tools/moore
-	url = https://github.com/fabianschuiki/moore.git
 [submodule "third_party/cores/rggen-sample"]
 	path = third_party/cores/rggen-sample
 	url = https://github.com/rggen/rggen-sample.git
@@ -104,7 +89,3 @@
 [submodule "third_party/tools/yosys-slang"]
 	path = third_party/tools/yosys-slang
 	url = https://github.com/povik/yosys-slang.git
-[submodule "third_party/tools/circt-verilog"]
-	path = third_party/tools/circt-verilog
-	url = https://github.com/llvm/circt.git
-	branch = main
