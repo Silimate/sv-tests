@@ -80,12 +80,7 @@ jobs:
       - name: Add bazel repo (if needed)
         if: ${{ contains(matrix.tool.deps, 'bazel') }}
         run: |
-          apt -qq -y install apt-transport-https curl gnupg
-          curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel.gpg
-          chmod a+r bazel.gpg
-          mv bazel.gpg /etc/apt/trusted.gpg.d/
-          echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
-          apt-get update -qq
+          apt -qq -y install apt-transport-https curl gnupg bazel-7.6.1
       - name: Install common dependencies
         run: |
           apt install -y python3 python3-pip git wget file
