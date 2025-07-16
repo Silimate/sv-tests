@@ -69,6 +69,14 @@ jobs:
       - name: Fix git safe directory
         run: |
           git config --global --add safe.directory ${{ github.workspace }}
+      - name: Setup Node
+        run: |
+          apt -qq -y install curl
+          touch "$HOME/.bash_profile"
+          # From https://nodejs.org/en/download
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
+          . "$HOME/.nvm/nvm.sh"
+          nvm install 22
       - name: Add bazel repo (if needed)
         if: ${{ contains(matrix.tool.deps, 'bazel') }}
         run: |
@@ -132,6 +140,8 @@ jobs:
           fi
           # yosys tool contains tests, is a dependency of other tools
           git submodule update --init --recursive --depth 1 third_party/tools/yosys
+          # icarus contains tests
+          git submodule update --init --depth 1 third_party/tools/icarus
       - name: Create Cache Timestamp
         id: cache_timestamp
         uses: nanzm/get-time-action@v1.1
@@ -150,6 +160,7 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           [[ -f $HOME/.cargo/env ]] && source $HOME/.cargo/env
+          . "$HOME/.bash_profile"  # GitHub Actions runs bash with --noprofile
           make ${{ matrix.tool.name }} -j$(nproc)
       - name: Check
         run:
@@ -230,6 +241,8 @@ jobs:
           git submodule update --init --recursive --depth 1 third_party/cores
           # yosys tool also contains tests
           git submodule update --init --recursive --depth 1 third_party/tools/yosys
+          # icarus contains tests
+          git submodule update --init --depth 1 third_party/tools/icarus
       - name: Summary
         run: |
           ./.github/workflows/summary.sh
@@ -250,9 +263,6 @@ jobs:
         run: |
           mkdir $TESTS_SUMMARY_DIR
           echo ${{ github.event.number }} > $TESTS_SUMMARY_DIR/issue_num
-          SUITE_INFO=`curl -s https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}`
-          SUITE_ID=`echo $SUITE_INFO | jq -r '.check_suite_id'`
-          echo $SUITE_ID > $TESTS_SUMMARY_DIR/suite_id
           cp $COMPARE_REPORT $TESTS_SUMMARY_DIR/report_base.csv
           cp $OUT_REPORT_DIR/report.csv $TESTS_SUMMARY_DIR/report_new.csv
           cp $OUT_REPORT_DIR/new_*csv $TESTS_SUMMARY_DIR

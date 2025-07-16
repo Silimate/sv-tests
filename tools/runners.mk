@@ -72,32 +72,28 @@ $(INSTALL_DIR)/bin/zachjs-sv2v:
 	$(MAKE) -C $(RDIR)/zachjs-sv2v
 	install -D $(RDIR)/zachjs-sv2v/bin/sv2v $@
 
-# tree-sitter-verilog
+# tree-sitter-verilog & tree-sitter-systemverilog
+tree-sitter-systemverilog: $(INSTALL_DIR)/bin/tree-sitter
+	(export PATH=$(INSTALL_DIR)/bin/:${PATH} && \
+		cd $(RDIR)/tree-sitter-systemverilog && tree-sitter generate)
+	mkdir -p $(abspath $(OUT_DIR)/tmp)
+	cp -r $(RDIR)/tree-sitter-systemverilog/src $(abspath $(OUT_DIR)/tmp/tree-sitter-systemverilog)
+
+
 tree-sitter-verilog: $(INSTALL_DIR)/lib/tree-sitter-verilog.so
 
-$(INSTALL_DIR)/lib/tree-sitter-verilog.so:
+$(INSTALL_DIR)/lib/tree-sitter-verilog.so: $(INSTALL_DIR)/bin/tree-sitter
 	mkdir -p $(INSTALL_DIR)/lib
-	cd $(RDIR)/tree-sitter-verilog && npm install
-	/usr/bin/env python3 -c "from tree_sitter import Language; Language.build_library(\"$@\", [\"$(abspath $(RDIR)/tree-sitter-verilog)\"])"
+	(export PATH=$(INSTALL_DIR)/bin/:${PATH} && \
+		cd $(RDIR)/tree-sitter-verilog && tree-sitter generate --abi 14)
+	cd $(RDIR)/tree-sitter-verilog && \
+		gcc -fPIC -c -I./src -Os src/parser.c && \
+		gcc -fPIC -shared -Os parser.o -o $@
 
-# tree-sitter-systemverilog
-tree-sitter-systemverilog: $(INSTALL_DIR)/lib/tree-sitter-systemverilog.so
-
-$(INSTALL_DIR)/lib/tree-sitter-systemverilog.so:
-	mkdir -p $(INSTALL_DIR)/lib
-	cd $(RDIR)/tree-sitter-systemverilog && \
-		cc -fPIC -c -I. src/parser.c && \
-		cc -fPIC -shared *.o -o $@
-
-# surelog-uhdm-verilator
-verilator-uhdm: $(INSTALL_DIR)/bin/verilator-uhdm
-
-# cannot use 'make -C uhdm-integration <target> as uhdm relies on $PWD
-$(INSTALL_DIR)/bin/verilator-uhdm:
-	mkdir -p $(INSTALL_DIR)
-	cd $(RDIR)/verilator-uhdm && ./build_binaries.sh
-	cp -r $(RDIR)/verilator-uhdm/image/* $(INSTALL_DIR)
-	mv $(INSTALL_DIR)/bin/verilator $(INSTALL_DIR)/bin/verilator-uhdm
+$(INSTALL_DIR)/bin/tree-sitter:
+	wget https://github.com/tree-sitter/tree-sitter/releases/download/v0.25.3/tree-sitter-linux-x64.gz
+	gunzip tree-sitter-linux-x64.gz
+	install -D tree-sitter-linux-x64 $@
 
 # yosys-synlig
 yosys-synlig: $(INSTALL_DIR)/bin/yosys-synlig
@@ -183,6 +179,6 @@ $(INSTALL_DIR)/bin/circt-verilog:
 	ninja && ninja install
 
 # setup the dependencies
-RUNNERS_TARGETS := odin yosys icarus verilator slang zachjs-sv2v tree-sitter-systemverilog tree-sitter-verilog sv-parser moore verible surelog yosys-synlig verilator-uhdm circt-verilog
+RUNNERS_TARGETS := odin yosys icarus verilator slang zachjs-sv2v tree-sitter-systemverilog tree-sitter-verilog sv-parser moore verible surelog yosys-synlig circt-verilog
 .PHONY: $(RUNNERS_TARGETS)
 runners: $(RUNNERS_TARGETS)
