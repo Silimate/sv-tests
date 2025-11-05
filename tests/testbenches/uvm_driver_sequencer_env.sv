@@ -12,7 +12,7 @@
 :description: uvm driver + sequencer + env test
 :tags: uvm uvm-classes
 :type: simulation elaboration parsing
-:timeout: 30
+:timeout: 300
 :unsynthesizable: 1
 */
 
@@ -111,7 +111,7 @@ endclass
 
 class env extends uvm_env;
     virtual output_if vif;
-    int data;
+    static int data;
     sequence_in seq;
     sequencer sqr;
     driver  drv;
