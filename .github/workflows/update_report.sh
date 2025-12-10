@@ -6,7 +6,7 @@ export CURRENT_PATH=$PWD
 set -ex
 
 git clone \
-  git@github.com:silimate/sv-tests-results.git \
+  git@github.com:silimate/sv-tests-pvt-results.git \
   --single-branch \
   --depth 1 \
   --branch gh-pages \

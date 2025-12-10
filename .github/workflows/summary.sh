@@ -8,7 +8,7 @@ export REPORTS_HISTORY=$(mktemp -d --suffix='.history')
 export BASE_REPORT="$REPORTS_HISTORY/report.csv"
 
 # Get base report from sv-tests master run
-git clone https://github.com/silimate/sv-tests-results.git --depth 120 $REPORTS_HISTORY
+git clone https://github.com/silimate/sv-tests-pvt-results.git --depth 120 $REPORTS_HISTORY
 
 # Delete headers from all report.csv
 for file in $(find ./out/report_* -name "*.csv" -print); do
