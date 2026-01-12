@@ -103,3 +103,6 @@
 [submodule "third_party/test/vloghammer"]
 	path = third_party/test/vloghammer
 	url = https://github.com/Silimate/vloghammer
+[submodule "third_party/tests/vloghammer"]
+	path = third_party/tests/vloghammer
+	url = https://github.com/Silimate/vloghammer

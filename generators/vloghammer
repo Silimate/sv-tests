@@ -3,12 +3,14 @@
 Generator script for VlogHammer tests.
 This script invokes the vloghammer generation process (make gen_samples)
 and wraps the resulting Verilog files for sv-tests.
+It instantiates the DUT in the top module to ensure the code is actually exercised.
 """
 
 import os
 import sys
 import subprocess
 import glob
+import re
 
 # Template for the sv-tests wrapper file
 WRAPPER_TEMPLATE = """/*
@@ -20,9 +22,47 @@ WRAPPER_TEMPLATE = """/*
 :top_module: top
 */
 module top;
-    // Test bench code can go here
+    // Signal declarations
+{signals}
+
+    // Module instantiation
+    {module_name} dut (
+{connections}
+    );
+
 endmodule
 """
+
+def parse_verilog_ports(content):
+    """
+    Parses a Verilog file content to find module name and ports.
+    Assumes simpler VlogHammer non-ANSI style:
+    module foo(a, b);
+      input [3:0] a;
+      output b;
+    """
+    module_match = re.search(r'module\s+(\w+)\s*\(', content)
+    if not module_match:
+        return None, []
+    
+    module_name = module_match.group(1)
+    
+    # regex for port declarations: input/output [range] name;
+    # We capture: direction, range (optional), name
+    port_pattern = re.compile(r'^\s*(input|output)\s+(?:(\[.*?\])\s+)?(\w+);', re.MULTILINE)
+    
+    ports = []
+    for match in port_pattern.finditer(content):
+        direction = match.group(1)
+        width = match.group(2) if match.group(2) else ""
+        name = match.group(3)
+        ports.append({
+            'dir': direction,
+            'width': width,
+            'name': name
+        })
+        
+    return module_name, ports
 
 def main():
     # Required environment variables
@@ -34,9 +74,13 @@ def main():
         sys.exit(1)
 
     # Path to vloghammer submodule
-    vloghammer_dir = os.path.join(third_party_dir, 'test', 'vloghammer')
+    # Check both potential locations to be robust
+    vloghammer_dir = os.path.join(third_party_dir, 'tests', 'vloghammer')
     if not os.path.isdir(vloghammer_dir):
-        print(f"Error: VlogHammer directory not found at {vloghammer_dir}")
+        vloghammer_dir = os.path.join(third_party_dir, 'test', 'vloghammer')
+    
+    if not os.path.isdir(vloghammer_dir):
+        print(f"Error: VlogHammer directory not found in third_party/tests/ or third_party/test/")
         sys.exit(1)
 
     # Output directory for generated tests
@@ -45,9 +89,6 @@ def main():
 
     print(f"Generating VlogHammer samples in {vloghammer_dir}")
     
-    # 1. trigger vloghammer generation
-    # We use 'gen_samples' for a smaller set, or 'generate' for full set.
-    # Using 'gen_samples' to keep it fast for now as per plan.
     try:
         subprocess.check_call(['make', 'gen_samples'], cwd=vloghammer_dir)
     except subprocess.CalledProcessError as e:
@@ -64,18 +105,40 @@ def main():
     for v_file in verilog_files:
         basename = os.path.basename(v_file)
         test_name = "vloghammer_" + os.path.splitext(basename)[0]
-        
-        # Absolute path to the original file
         abs_v_file = os.path.abspath(v_file)
         
-        # Determine wrapper filename
+        # Read content to parse ports
+        with open(v_file, 'r') as f:
+            content = f.read()
+            
+        module_name, ports = parse_verilog_ports(content)
+        
+        if not module_name:
+            print(f"Warning: Could not parse module from {basename}")
+            continue
+
+        # Generate signals and connections
+        signals = []
+        connections = []
+        
+        for p in ports:
+            decl = f"    { 'reg' if p['dir'] == 'input' else 'wire' } {p['width']} {p['name']};"
+            signals.append(decl)
+            connections.append(f"        .{p['name']}({p['name']})")
+            
+        signals_str = "\n".join(signals)
+        connections_str = ",\n".join(connections)
+        
         wrapper_filename = os.path.join(output_dir, test_name + '.sv')
         
         with open(wrapper_filename, 'w') as f:
             f.write(WRAPPER_TEMPLATE.format(
                 name=test_name,
                 basename=basename,
-                files=abs_v_file
+                files=abs_v_file,
+                signals=signals_str,
+                module_name=module_name,
+                connections=connections_str
             ))
 
     print(f"Successfully generated {len(verilog_files)} wrappers in {output_dir}")
