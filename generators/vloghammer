@@ -3,7 +3,8 @@
 Generator script for VlogHammer tests.
 This script invokes the vloghammer generation process (make gen_samples)
 and wraps the resulting Verilog files for sv-tests.
-It instantiates the DUT in the top module to ensure the code is actually exercised.
+It instantiates the DUT in the top module AND copies the DUT content
+into the file to make it self-contained.
 """
 
 import os
@@ -13,12 +14,12 @@ import glob
 import re
 
 # Template for the sv-tests wrapper file
+# Note: :files: metadata is removed/empty because the content is embedded.
 WRAPPER_TEMPLATE = """/*
 :name: {name}
 :description: VlogHammer generated test: {basename}
 :tags: vloghammer
 :type: simulation elaboration parsing
-:files: {files}
 :top_module: top
 */
 module top;
@@ -31,6 +32,12 @@ module top;
     );
 
 endmodule
+
+// -----------------------------------------------------------------------------
+// Embedded VlogHammer Generated Code
+// -----------------------------------------------------------------------------
+
+{dut_content}
 """
 
 def parse_verilog_ports(content):
@@ -105,9 +112,8 @@ def main():
     for v_file in verilog_files:
         basename = os.path.basename(v_file)
         test_name = "vloghammer_" + os.path.splitext(basename)[0]
-        abs_v_file = os.path.abspath(v_file)
         
-        # Read content to parse ports
+        # Read content
         with open(v_file, 'r') as f:
             content = f.read()
             
@@ -135,10 +141,10 @@ def main():
             f.write(WRAPPER_TEMPLATE.format(
                 name=test_name,
                 basename=basename,
-                files=abs_v_file,
                 signals=signals_str,
                 module_name=module_name,
-                connections=connections_str
+                connections=connections_str,
+                dut_content=content
             ))
 
     print(f"Successfully generated {len(verilog_files)} wrappers in {output_dir}")
