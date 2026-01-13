@@ -21,6 +21,7 @@ WRAPPER_TEMPLATE = """/*
 :tags: vloghammer
 :type: simulation elaboration parsing
 :top_module: top
+:timeout: 120
 */
 module top;
     // Signal declarations
