@@ -92,7 +92,7 @@ def main():
     print(f"Generating VlogHammer samples in {vloghammer_dir}")
 
     try:
-        subprocess.check_call(['make', 'gen_samples'], cwd=vloghammer_dir)
+        subprocess.check_call(['make', 'generate'], cwd=vloghammer_dir)
     except subprocess.CalledProcessError as e:
         print(f"Error running make gen_samples: {e}")
         sys.exit(1)
