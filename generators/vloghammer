@@ -92,7 +92,7 @@ def main():
     print(f"Generating VlogHammer samples in {vloghammer_dir}")
 
     try:
-        subprocess.check_call(['make', 'generate'], cwd=vloghammer_dir)
+        subprocess.check_call(['make', 'gen_samples'], cwd=vloghammer_dir)
     except subprocess.CalledProcessError as e:
         print(f"Error running make gen_samples: {e}")
         sys.exit(1)
@@ -126,7 +126,7 @@ def main():
         signals_str = "\n".join(signals)
         connections_str = ",\n".join(connections)
 
-        wrapper_filename = os.path.join(output_dir, test_name + '.sv')
+        wrapper_filename = os.path.join(output_dir, test_name + '.v')
 
         with open(wrapper_filename, 'w') as f:
             f.write(WRAPPER_TEMPLATE.format(
