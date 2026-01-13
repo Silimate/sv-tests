@@ -104,7 +104,7 @@ def main():
 
     for v_file in verilog_files:
         basename = os.path.basename(v_file)
-        test_name = "vloghammer_" + os.path.splitext(basename)[0]
+        test_name = os.path.splitext(basename)[0]
 
         with open(v_file, 'r') as f:
             content = f.read()
