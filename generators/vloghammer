@@ -52,13 +52,11 @@ def parse_verilog_ports(content):
     module_match = re.search(r'module\s+(\w+)\s*\(', content)
     if not module_match:
         return None, []
-    
+
     module_name = module_match.group(1)
-    
-    # regex for port declarations: input/output [range] name;
-    # We capture: direction, range (optional), name
+
     port_pattern = re.compile(r'^\s*(input|output)\s+(?:(\[.*?\])\s+)?(\w+);', re.MULTILINE)
-    
+
     ports = []
     for match in port_pattern.finditer(content):
         direction = match.group(1)
@@ -69,11 +67,10 @@ def parse_verilog_ports(content):
             'width': width,
             'name': name
         })
-        
+
     return module_name, ports
 
 def main():
-    # Required environment variables
     try:
         third_party_dir = os.environ['THIRD_PARTY_DIR']
         tests_dir = os.environ['TESTS_DIR']
@@ -81,63 +78,56 @@ def main():
         print("Error: TESTS_DIR and THIRD_PARTY_DIR environment variables must be set")
         sys.exit(1)
 
-    # Path to vloghammer submodule
-    # Check both potential locations to be robust
     vloghammer_dir = os.path.join(third_party_dir, 'tests', 'vloghammer')
     if not os.path.isdir(vloghammer_dir):
         vloghammer_dir = os.path.join(third_party_dir, 'test', 'vloghammer')
-    
+
     if not os.path.isdir(vloghammer_dir):
         print(f"Error: VlogHammer directory not found in third_party/tests/ or third_party/test/")
         sys.exit(1)
 
-    # Output directory for generated tests
     output_dir = os.path.join(tests_dir, 'generated', 'vloghammer')
     os.makedirs(output_dir, exist_ok=True)
 
     print(f"Generating VlogHammer samples in {vloghammer_dir}")
-    
+
     try:
         subprocess.check_call(['make', 'gen_samples'], cwd=vloghammer_dir)
     except subprocess.CalledProcessError as e:
         print(f"Error running make gen_samples: {e}")
         sys.exit(1)
 
-    # 2. Find generated RTL files
     rtl_dir = os.path.join(vloghammer_dir, 'rtl')
     verilog_files = glob.glob(os.path.join(rtl_dir, '*.v'))
-    
+
     print(f"Found {len(verilog_files)} generated files.")
 
-    # 3. Create wrappers
     for v_file in verilog_files:
         basename = os.path.basename(v_file)
         test_name = "vloghammer_" + os.path.splitext(basename)[0]
-        
-        # Read content
+
         with open(v_file, 'r') as f:
             content = f.read()
-            
+
         module_name, ports = parse_verilog_ports(content)
-        
+
         if not module_name:
             print(f"Warning: Could not parse module from {basename}")
             continue
 
-        # Generate signals and connections
         signals = []
         connections = []
-        
+
         for p in ports:
             decl = f"    { 'reg' if p['dir'] == 'input' else 'wire' } {p['width']} {p['name']};"
             signals.append(decl)
             connections.append(f"        .{p['name']}({p['name']})")
-            
+
         signals_str = "\n".join(signals)
         connections_str = ",\n".join(connections)
-        
+
         wrapper_filename = os.path.join(output_dir, test_name + '.sv')
-        
+
         with open(wrapper_filename, 'w') as f:
             f.write(WRAPPER_TEMPLATE.format(
                 name=test_name,
