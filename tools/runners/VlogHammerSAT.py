@@ -33,7 +33,7 @@ class VlogHammerSAT(BaseRunner):
         test_name = params['name']
 
         basename = os.path.basename(test_name)
-        job_name = basename.replace("vloghammer_", "").replace(".sv", "")
+        job_name = basename.replace("vloghammer_", "").replace(".v", "")
 
         third_party_dir = os.path.abspath(os.environ['THIRD_PARTY_DIR'])
         vloghammer_dir = os.path.join(third_party_dir, 'tests', 'vloghammer')
@@ -42,6 +42,7 @@ class VlogHammerSAT(BaseRunner):
 
         run_script = os.path.join(tmp_dir, "run.sh")
 
+        # running the test from vLoghammer
         with open(run_script, 'w') as f:
             f.write("set -x\n")
             f.write(f"cd {vloghammer_dir}\n")
@@ -53,4 +54,27 @@ class VlogHammerSAT(BaseRunner):
         self.cmd = ['sh', run_script]
 
     def is_success_returncode(self, rc, params):
-        return rc == 0
+        # success = 0 from make
+        if rc != 0:
+            return False
+
+        test_name = params['name']
+        basename = os.path.basename(test_name)
+        job_name = basename.replace("vloghammer_", "").replace(".v", "")
+        
+        third_party_dir = os.path.abspath(os.environ['THIRD_PARTY_DIR'])
+        vloghammer_dir = os.path.join(third_party_dir, 'tests', 'vloghammer')
+        if not os.path.isdir(vloghammer_dir):
+             vloghammer_dir = os.path.join(third_party_dir, 'test', 'vloghammer')
+
+        check_dir = os.path.join(vloghammer_dir, "check_yosys")
+        err_file = os.path.join(check_dir, f"{job_name}.err")
+        txt_file = os.path.join(check_dir, f"{job_name}.txt")
+        
+        if os.path.exists(err_file):
+            return False
+        
+        if os.path.exists(txt_file):
+            return True
+            
+        return False
