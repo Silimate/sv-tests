@@ -7,11 +7,11 @@ It instantiates the DUT in the top module AND copies the DUT content
 into the file to make it self-contained.
 """
 
-import os
-import sys
-import subprocess
 import glob
+import os
 import re
+import subprocess
+import sys
 
 # Template for the sv-tests wrapper file
 # Note: :files: metadata is removed/empty because the content is embedded.
@@ -50,58 +50,70 @@ def parse_verilog_ports(content):
       input [3:0] a;
       output b;
     """
-    module_match = re.search(r'module\s+(\w+)\s*\(', content)
+    module_match = re.search(r"module\s+(\w+)\s*\(", content)
     if not module_match:
         return None, []
 
     module_name = module_match.group(1)
 
     port_pattern = re.compile(
-        r'^\s*(input|output)\s+(?:(\[.*?\])\s+)?(\w+);', re.MULTILINE)
+        r"^\s*(input|output)\s+(?:(\[.*?\])\s+)?(\w+);",
+        re.MULTILINE,
+    )
 
     ports = []
     for match in port_pattern.finditer(content):
         direction = match.group(1)
         width = match.group(2) if match.group(2) else ""
         name = match.group(3)
-        ports.append({'dir': direction, 'width': width, 'name': name})
+        ports.append(
+            {
+                "dir": direction,
+                "width": width,
+                "name": name,
+            }
+        )
 
     return module_name, ports
 
 
 def main():
     try:
-        third_party_dir = os.environ['THIRD_PARTY_DIR']
-        tests_dir = os.environ['TESTS_DIR']
+        third_party_dir = os.environ["THIRD_PARTY_DIR"]
+        tests_dir = os.environ["TESTS_DIR"]
     except KeyError:
         print(
             "Error: TESTS_DIR and THIRD_PARTY_DIR environment variables must be set"
         )
         sys.exit(1)
 
-    vloghammer_dir = os.path.join(third_party_dir, 'tests', 'vloghammer')
+    vloghammer_dir = os.path.join(third_party_dir, "tests", "vloghammer")
     if not os.path.isdir(vloghammer_dir):
-        vloghammer_dir = os.path.join(third_party_dir, 'test', 'vloghammer')
+        vloghammer_dir = os.path.join(third_party_dir, "test", "vloghammer")
 
     if not os.path.isdir(vloghammer_dir):
         print(
-            f"Error: VlogHammer directory not found in third_party/tests/ or third_party/test/"
+            "Error: VlogHammer directory not found in "
+            "third_party/tests/ or third_party/test/"
         )
         sys.exit(1)
 
-    output_dir = os.path.join(tests_dir, 'generated', 'vloghammer')
+    output_dir = os.path.join(tests_dir, "generated", "vloghammer")
     os.makedirs(output_dir, exist_ok=True)
 
     print(f"Generating VlogHammer samples in {vloghammer_dir}")
 
     try:
-        subprocess.check_call(['make', 'gen_samples'], cwd=vloghammer_dir)
+        subprocess.check_call(
+            ["make", "gen_samples"],
+            cwd=vloghammer_dir,
+        )
     except subprocess.CalledProcessError as e:
         print(f"Error running make gen_samples: {e}")
         sys.exit(1)
 
-    rtl_dir = os.path.join(vloghammer_dir, 'rtl')
-    verilog_files = glob.glob(os.path.join(rtl_dir, '*.v'))
+    rtl_dir = os.path.join(vloghammer_dir, "rtl")
+    verilog_files = glob.glob(os.path.join(rtl_dir, "*.v"))
 
     print(f"Found {len(verilog_files)} generated files.")
 
@@ -109,7 +121,7 @@ def main():
         basename = os.path.basename(v_file)
         test_name = os.path.splitext(basename)[0]
 
-        with open(v_file, 'r') as f:
+        with open(v_file, "r") as f:
             content = f.read()
 
         module_name, ports = parse_verilog_ports(content)
@@ -122,16 +134,22 @@ def main():
         connections = []
 
         for p in ports:
-            decl = f"    { 'reg' if p['dir'] == 'input' else 'wire' } {p['width']} {p['name']};"
+            decl = (
+                f"    {'reg' if p['dir'] == 'input' else 'wire'} "
+                f"{p['width']} {p['name']};"
+            )
             signals.append(decl)
             connections.append(f"        .{p['name']}({p['name']})")
 
         signals_str = "\n".join(signals)
         connections_str = ",\n".join(connections)
 
-        wrapper_filename = os.path.join(output_dir, test_name + '.v')
+        wrapper_filename = os.path.join(
+            output_dir,
+            test_name + ".v",
+        )
 
-        with open(wrapper_filename, 'w') as f:
+        with open(wrapper_filename, "w") as f:
             f.write(
                 WRAPPER_TEMPLATE.format(
                     name=test_name,
@@ -139,7 +157,9 @@ def main():
                     signals=signals_str,
                     module_name=module_name,
                     connections=connections_str,
-                    dut_content=content))
+                    dut_content=content,
+                )
+            )
 
     print(
         f"Successfully generated {len(verilog_files)} wrappers in {output_dir}"

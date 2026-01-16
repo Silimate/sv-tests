@@ -18,49 +18,66 @@ from BaseRunner import BaseRunner
 class VlogHammerSAT(BaseRunner):
     def __init__(self):
         super().__init__(
-            "vloghammer_sat", "yosys",
-            {"simulation", "elaboration", "parsing"})
+            "vloghammer_sat",
+            "yosys",
+            {"simulation", "elaboration", "parsing"},
+        )
         self.submodule = "third_party/tests/vloghammer"
 
     def get_mode(self, params):
-        return "simulation"
+        # SECURITY CHECK: Only run if the 'vloghammer' tag is present
+        if "tags" not in params or "vloghammer" not in params["tags"]:
+            return None
+
+        return super().get_mode(params)
 
     def prepare_run_cb(self, tmp_dir, params):
-        self.cmd = []
-        test_name = params['name']
+        test_name = params["name"]
+
         basename = os.path.basename(test_name)
         job_name = basename.replace(".v", "")
 
-        third_party_dir = os.path.abspath(os.environ['THIRD_PARTY_DIR'])
-        vloghammer_dir = os.path.join(third_party_dir, 'tests', 'vloghammer')
+        third_party_dir = os.path.abspath(os.environ["THIRD_PARTY_DIR"])
+        vloghammer_dir = os.path.join(
+            third_party_dir, "tests", "vloghammer"
+        )
         if not os.path.isdir(vloghammer_dir):
             vloghammer_dir = os.path.join(
-                third_party_dir, 'test', 'vloghammer')
+                third_party_dir, "test", "vloghammer"
+            )
 
         run_script = os.path.join(tmp_dir, "run.sh")
 
+        # running the test from vLoghammer
         with open(run_script, "w") as f:
-            f.write("set -e\n")
             f.write("set -x\n")
             f.write(f"cd {vloghammer_dir}\n")
-            f.write(f"make check_yosys DEPS=1 RTL_LIST={job_name}\n")
+            f.write(
+                f"make syn_yosys DEPS=1 RTL_LIST={job_name}\n"
+            )
+            f.write(
+                f"make check_yosys DEPS=1 RTL_LIST={job_name}\n"
+            )
             f.write(f"cat check_yosys/{job_name}.txt\n")
 
-        self.cmd = ['sh', run_script]
+        self.cmd = ["sh", run_script]
 
     def is_success_returncode(self, rc, params):
         if rc != 0:
             return False
 
-        test_name = params['name']
+        test_name = params["name"]
         basename = os.path.basename(test_name)
         job_name = basename.replace(".v", "")
 
-        third_party_dir = os.path.abspath(os.environ['THIRD_PARTY_DIR'])
-        vloghammer_dir = os.path.join(third_party_dir, 'tests', 'vloghammer')
+        third_party_dir = os.path.abspath(os.environ["THIRD_PARTY_DIR"])
+        vloghammer_dir = os.path.join(
+            third_party_dir, "tests", "vloghammer"
+        )
         if not os.path.isdir(vloghammer_dir):
             vloghammer_dir = os.path.join(
-                third_party_dir, 'test', 'vloghammer')
+                third_party_dir, "test", "vloghammer"
+            )
 
         check_dir = os.path.join(vloghammer_dir, "check_yosys")
         err_file = os.path.join(check_dir, f"{job_name}.err")
