@@ -45,7 +45,7 @@ class Yosys(BaseRunner):
 
         top = params['top_module'] or None
         if (top is not None):
-            top_opt = "-top \\{top}"
+            top_opt = f"-top {top}"
         else:
             top_opt = "-auto-top"
 
