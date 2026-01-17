@@ -102,7 +102,8 @@ def main():
 
     try:
         subprocess.check_call(
-            ["make", "gen_samples"],
+            ["make", "gen_samples"
+             ],  # change this to make generate for all tests
             cwd=vloghammer_dir,
         )
     except subprocess.CalledProcessError as e:
