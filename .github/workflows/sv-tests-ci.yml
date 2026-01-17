@@ -288,6 +288,7 @@ jobs:
       - name: Find artifacts that are no longer needed
         id: get-artifacts-to-delete
         if: github.event_name == 'pull_request'
+        shell: bash
         run: |
           artifacts=$(find ./out -type d -name 'report_*' -exec basename {} \;)
           echo $artifacts
