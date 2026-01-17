@@ -35,6 +35,7 @@ jobs:
             ./.dependabot/
             ./miniconda.sh
             ./build/
+            ./third_party/tests/vloghammer/
           third_party: |
             ./third_party/cores/
             ./third_party/tests/
