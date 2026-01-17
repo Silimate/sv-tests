@@ -66,13 +66,11 @@ def parse_verilog_ports(content):
         direction = match.group(1)
         width = match.group(2) if match.group(2) else ""
         name = match.group(3)
-        ports.append(
-            {
-                "dir": direction,
-                "width": width,
-                "name": name,
-            }
-        )
+        ports.append({
+            "dir": direction,
+            "width": width,
+            "name": name,
+        })
 
     return module_name, ports
 
@@ -94,8 +92,7 @@ def main():
     if not os.path.isdir(vloghammer_dir):
         print(
             "Error: VlogHammer directory not found in "
-            "third_party/tests/ or third_party/test/"
-        )
+            "third_party/tests/ or third_party/test/")
         sys.exit(1)
 
     output_dir = os.path.join(tests_dir, "generated", "vloghammer")
@@ -136,8 +133,7 @@ def main():
         for p in ports:
             decl = (
                 f"    {'reg' if p['dir'] == 'input' else 'wire'} "
-                f"{p['width']} {p['name']};"
-            )
+                f"{p['width']} {p['name']};")
             signals.append(decl)
             connections.append(f"        .{p['name']}({p['name']})")
 
@@ -158,8 +154,7 @@ def main():
                     module_name=module_name,
                     connections=connections_str,
                     dut_content=content,
-                )
-            )
+                ))
 
     print(
         f"Successfully generated {len(verilog_files)} wrappers in {output_dir}"

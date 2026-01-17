@@ -38,13 +38,10 @@ class VlogHammerSAT(BaseRunner):
         job_name = basename.replace(".v", "")
 
         third_party_dir = os.path.abspath(os.environ["THIRD_PARTY_DIR"])
-        vloghammer_dir = os.path.join(
-            third_party_dir, "tests", "vloghammer"
-        )
+        vloghammer_dir = os.path.join(third_party_dir, "tests", "vloghammer")
         if not os.path.isdir(vloghammer_dir):
             vloghammer_dir = os.path.join(
-                third_party_dir, "test", "vloghammer"
-            )
+                third_party_dir, "test", "vloghammer")
 
         run_script = os.path.join(tmp_dir, "run.sh")
 
@@ -52,12 +49,8 @@ class VlogHammerSAT(BaseRunner):
         with open(run_script, "w") as f:
             f.write("set -x\n")
             f.write(f"cd {vloghammer_dir}\n")
-            f.write(
-                f"make syn_yosys DEPS=1 RTL_LIST={job_name}\n"
-            )
-            f.write(
-                f"make check_yosys DEPS=1 RTL_LIST={job_name}\n"
-            )
+            f.write(f"make syn_yosys DEPS=1 RTL_LIST={job_name}\n")
+            f.write(f"make check_yosys DEPS=1 RTL_LIST={job_name}\n")
             f.write(f"cat check_yosys/{job_name}.txt\n")
 
         self.cmd = ["sh", run_script]
@@ -71,13 +64,10 @@ class VlogHammerSAT(BaseRunner):
         job_name = basename.replace(".v", "")
 
         third_party_dir = os.path.abspath(os.environ["THIRD_PARTY_DIR"])
-        vloghammer_dir = os.path.join(
-            third_party_dir, "tests", "vloghammer"
-        )
+        vloghammer_dir = os.path.join(third_party_dir, "tests", "vloghammer")
         if not os.path.isdir(vloghammer_dir):
             vloghammer_dir = os.path.join(
-                third_party_dir, "test", "vloghammer"
-            )
+                third_party_dir, "test", "vloghammer")
 
         check_dir = os.path.join(vloghammer_dir, "check_yosys")
         err_file = os.path.join(check_dir, f"{job_name}.err")
