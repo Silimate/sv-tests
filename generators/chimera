@@ -38,6 +38,7 @@ def ChiBench():
     :type: parsing
     */
     """
+    os.makedirs(output_dir, exist_ok=True)
     limit = 5
     count = 0
     for f in glob.glob(os.path.join(chimera_root, "3k_programs_for_bugs",
@@ -67,6 +68,7 @@ def ChiGen():
     :type: parsing
     */
     """
+    os.makedirs(output_dir, exist_ok=True)
     limit = 5
     count = 0
     for f in glob.glob(os.path.join(chimera_root, "3k_programs_for_bugs",
