@@ -25,6 +25,7 @@ subdir = 'chimera'
 chimera_root = os.path.join(third_party_dir, 'tests', 'chimera')
 
 build_dir = os.path.join(chimera_root, 'build')
+chimera_bin = os.path.join(chimera_root, 'build', 'Chimera')
 
 if not os.path.exists(chimera_bin):
     print("Chimera binary not found. Building Chimera...")
@@ -45,7 +46,7 @@ os.makedirs(output_dir, exist_ok=True)
 
 print(f"Generating tests in {output_dir}...")
 
-chimera_bin = os.path.join(chimera_root, 'build', 'Chimera')
+
 
 success = 0
 failed = 0
