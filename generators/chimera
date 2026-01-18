@@ -23,6 +23,21 @@ except KeyError:
 ChiGen = True
 ChiBench = True
 
+header_ChiGen = """/*
+:name: {name}
+:description: Imported test case from ChiGen
+:tags: chimera
+:type: parsing
+*/
+"""
+
+header_ChiBench = """/*
+:name: {name}
+:description: Imported test case from ChiBench
+:tags: chimera
+:type: parsing
+*/
+"""
 subdir = 'chimera'
 
 chimera_root = os.path.join(third_party_dir, 'tests', 'chimera')
@@ -31,13 +46,6 @@ output_dir = os.path.join(tests_dir, 'generated', subdir)
 
 def ChiBench():
 
-    header_templ = """/*
-    :name: {name}
-    :description: Imported test case from ChiBench
-    :tags: chimera
-    :type: parsing
-    */
-    """
     os.makedirs(output_dir, exist_ok=True)
     limit = 5
     count = 0
@@ -52,7 +60,7 @@ def ChiBench():
         with open(f, 'r') as source_file:
             content = source_file.read()
         with open(output_file, "w") as dest_file:
-            dest_file.write(header_templ.format(name=test_name))
+            dest_file.write(header_ChiBench.format(name=test_name))
             dest_file.write(content)
 
         count += 1
@@ -61,13 +69,6 @@ def ChiBench():
 
 def ChiGen():
 
-    header_templ = """/*
-    :name: {name}
-    :description: Imported test case from ChiGen
-    :tags: chimera
-    :type: parsing
-    */
-    """
     os.makedirs(output_dir, exist_ok=True)
     limit = 5
     count = 0
@@ -82,7 +83,7 @@ def ChiGen():
         with open(f, 'r') as source_file:
             content = source_file.read()
         with open(output_file, "w") as dest_file:
-            dest_file.write(header_templ.format(name=test_name))
+            dest_file.write(header_ChiGen.format(name=test_name))
             dest_file.write(content)
 
         count += 1
