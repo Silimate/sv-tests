@@ -8,10 +8,10 @@
 # https://opensource.org/licenses/ISC
 #
 # SPDX-License-Identifier: ISC
-
 import os
 import sys
 import subprocess
+import glob
 
 try:
     tests_dir = os.environ['TESTS_DIR']
@@ -20,73 +20,141 @@ except KeyError:
     print("Export the TESTS_DIR and THIRD_PARTY_DIR variables first")
     sys.exit(1)
 
+ChiGen = True
+ChiBench = True
+
 subdir = 'chimera'
 
 chimera_root = os.path.join(third_party_dir, 'tests', 'chimera')
-
-build_dir = os.path.join(chimera_root, 'build')
-chimera_bin = os.path.join(chimera_root, 'build', 'Chimera')
-
-if not os.path.exists(chimera_bin):
-    print("Chimera binary not found. Building Chimera...")
-
-    os.makedirs(build_dir, exist_ok=True)
-
-    try:
-        subprocess.check_call(['cmake', '../src'], cwd=build_dir)
-        subprocess.check_call(['make', 'Chimera'], cwd=build_dir)
-        print("Chimera built successfully.")
-    except subprocess.CalledProcessError as e:
-        print(f"Error building Chimera: {e}")
-        sys.exit(1)
-else:
-    print(f"Chimera binary found at {chimera_bin}")
 output_dir = os.path.join(tests_dir, 'generated', subdir)
-os.makedirs(output_dir, exist_ok=True)
-
-print(f"Generating tests in {output_dir}...")
 
 
+def ChiBench():
 
-success = 0
-failed = 0
+    header_templ = """/*
+    :name: {name}
+    :description: Imported test case from ChiBench
+    :tags: chimera
+    :type: parsing
+    */
+    """
+    limit = 5
+    count = 0
+    for f in glob.glob(os.path.join(chimera_root, "3k_programs_for_bugs",
+                                    "chibench", '*.v')):
+        if count >= limit:
+            break
 
-json_files = os.listdir(os.path.join(chimera_root, 'json'))
-json_files.sort()
+        filename = os.path.basename(f)
+        test_name = os.path.splitext(filename)[0]
+        output_file = os.path.join(output_dir, test_name + '.v')
+        with open(f, 'r') as source_file:
+            content = source_file.read()
+        with open(output_file, "w") as dest_file:
+            dest_file.write(header_templ.format(name=test_name))
+            dest_file.write(content)
 
-for json_file in json_files:
-    print(f"  genrating test for {chimera_root}/{json_file} grammer file")
-    test_name = f"chimera_{json_file}"
-    filename = os.path.join(output_dir, f"{test_name}.sv")
+        count += 1
+    print(f"Copied {count} ChiGen tests to {output_dir}")
 
-    cmd = [chimera_bin, os.path.join(chimera_root, 'json', json_file), "1"]
 
-    try:
-        result = subprocess.run(cmd, capture_output=True, text=True)
+def ChiGen():
 
-        if result.returncode != 0:
-            print(f"    Test for {json_file} failed to generate")
+    header_templ = """/*
+    :name: {name}
+    :description: Imported test case from ChiGen
+    :tags: chimera
+    :type: parsing
+    */
+    """
+    limit = 5
+    count = 0
+    for f in glob.glob(os.path.join(chimera_root, "3k_programs_for_bugs",
+                                    "chigen", '*.v')):
+        if count >= limit:
+            break
+
+        filename = os.path.basename(f)
+        test_name = os.path.splitext(filename)[0]
+        output_file = os.path.join(output_dir, test_name + '.v')
+        with open(f, 'r') as source_file:
+            content = source_file.read()
+        with open(output_file, "w") as dest_file:
+            dest_file.write(header_templ.format(name=test_name))
+            dest_file.write(content)
+
+        count += 1
+    print(f"Copied {count} ChiGen tests to {output_dir}")
+    build_dir = os.path.join(chimera_root, 'build')
+    chimera_bin = os.path.join(chimera_root, 'build', 'Chimera')
+
+    return  # skiping the manual genration
+
+    if not os.path.exists(chimera_bin):
+        print("Chimera binary not found. Building Chimera...")
+
+        os.makedirs(build_dir, exist_ok=True)
+
+        try:
+            subprocess.check_call(['cmake', '../src'], cwd=build_dir)
+            subprocess.check_call(['make', 'Chimera'], cwd=build_dir)
+            print("Chimera built successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"Error building Chimera: {e}")
+            sys.exit(1)
+    else:
+        print(f"Chimera binary found at {chimera_bin}")
+    os.makedirs(output_dir, exist_ok=True)
+
+    print(f"ChiGen : Generating tests in {output_dir}...")
+
+    success = 0
+    failed = 0
+
+    json_files = os.listdir(os.path.join(chimera_root, 'json'))
+    json_files.sort()
+    json_files = json_files[0:1]  # as genration take time this for now
+
+    for json_file in json_files:
+        print(f"  genrating test for {chimera_root}/{json_file} grammer file")
+        test_name = f"ChiGen_{json_file}"
+        filename = os.path.join(output_dir, f"{test_name}.sv")
+
+        cmd = [chimera_bin, os.path.join(chimera_root, 'json', json_file), "1"]
+
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True)
+
+            if result.returncode != 0:
+                print(f"    Test for {json_file} failed to generate")
+                failed += 1
+                continue
+
+            verilog_code = result.stdout
+
+            header = (
+                "/*\n"
+                f":name: {test_name}\n"
+                ":description: Chimera test - ChiGen\n"
+                ":tags: chimera\n"
+                ":type: parsing\n"
+                "*/\n")
+
+            with open(filename, 'w') as f:
+                f.write(header + verilog_code)
+
+            print(f"    Test {test_name} added to {output_dir}")
+            success += 1
+
+        except Exception as e:
+            print(f"    Test {test_name} error: {e}")
             failed += 1
-            continue
 
-        verilog_code = result.stdout
+    print(f"Done. Success: {success}, Failed: {failed}")
 
-        header = (
-            "/*\n"
-            f":name: {test_name}\n"
-            ":description: Randomly generated Chimera test\n"
-            ":tags: chimera\n"
-            ":type: parsing\n"
-            "*/\n")
 
-        with open(filename, 'w') as f:
-            f.write(header + verilog_code)
+if (ChiGen):
+    ChiGen()
 
-        print(f"    Test {test_name} added to {output_dir}")
-        success += 1
-
-    except Exception as e:
-        print(f"    Test {test_name} error: {e}")
-        failed += 1
-
-print(f"Done. Success: {success}, Failed: {failed}")
+if (ChiBench):
+    ChiBench()
