@@ -87,3 +87,6 @@
 [submodule "third_party/tools/verilator"]
 	path = third_party/tools/verilator
 	url = https://github.com/verilator/verilator
+[submodule "third_party/tests/chimera"]
+	path = third_party/tests/chimera
+	url = https://github.com/Silimate/chimera.git
