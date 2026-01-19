@@ -82,7 +82,7 @@ def main():
     for i in range(num_tests):
         test_name = f"verismith_{i}"
         filename = f"{test_name}.v"
-        filepath = os.path.join(output_dir, filename)
+        filepath = os.path.abspath(os.path.join(output_dir, filename))
 
         # Generate the Verilog file
         try:
