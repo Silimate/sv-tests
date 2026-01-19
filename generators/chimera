@@ -64,7 +64,7 @@ def ChiBench():
             dest_file.write(content)
 
         count += 1
-    print(f"Copied {count} ChiGen tests to {output_dir}")
+    print(f"Copied {count} ChiBench tests to {output_dir}")
 
 
 def ChiGen():
