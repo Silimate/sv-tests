@@ -16,7 +16,7 @@ jobs:
       matrix:
         tool:
           - name: icarus
-            deps: autoconf autotools-dev bison flex libfl-dev gperf clang cmake 
+            deps: autoconf autotools-dev bison flex libfl-dev gperf clang cmake
           - name: slang
             deps: cmake pkg-config clang
           # - name: surelog
