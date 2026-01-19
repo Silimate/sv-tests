@@ -90,3 +90,6 @@
 [submodule "third_party/tests/chimera"]
 	path = third_party/tests/chimera
 	url = https://github.com/Silimate/chimera.git
+[submodule "third_party/tests/vloghammer"]
+	path = third_party/tests/vloghammer
+	url = https://github.com/Silimate/vloghammer
