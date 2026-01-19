@@ -20,8 +20,8 @@ except KeyError:
     print("Export the TESTS_DIR and THIRD_PARTY_DIR variables first")
     sys.exit(1)
 
-ChiGen = True
-ChiBench = True
+run_ChiGen = True
+run_ChiBench = True
 
 header_ChiGen = """/*
 :name: {name}
@@ -156,8 +156,8 @@ def ChiGen():
     print(f"Done. Success: {success}, Failed: {failed}")
 
 
-if (ChiGen):
+if (run_ChiGen):
     ChiGen()
 
-if (ChiBench):
+if (run_ChiBench):
     ChiBench()
