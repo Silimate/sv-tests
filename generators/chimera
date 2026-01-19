@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2020 The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier: ISC
+import os
+import sys
+import subprocess
+import glob
+
+try:
+    tests_dir = os.environ['TESTS_DIR']
+    third_party_dir = os.environ['THIRD_PARTY_DIR']
+except KeyError:
+    print("Export the TESTS_DIR and THIRD_PARTY_DIR variables first")
+    sys.exit(1)
+
+run_ChiGen = True
+run_ChiBench = True
+
+header_ChiGen = """/*
+:name: {name}
+:description: Imported test case from ChiGen
+:tags: chimera
+:type: parsing
+*/
+"""
+
+header_ChiBench = """/*
+:name: {name}
+:description: Imported test case from ChiBench
+:tags: chimera
+:type: parsing
+*/
+"""
+subdir = 'chimera'
+
+chimera_root = os.path.join(third_party_dir, 'tests', 'chimera')
+output_dir = os.path.join(tests_dir, 'generated', subdir)
+
+if (run_ChiBench):
+
+    os.makedirs(output_dir, exist_ok=True)
+    limit = 50
+    count = 0
+    for f in glob.glob(os.path.join(chimera_root, "3k_programs_for_bugs",
+                                    "chibench", '*.v')):
+        if count >= limit:
+            break
+
+        filename = os.path.basename(f)
+        test_name = os.path.splitext(filename)[0]
+        output_file = os.path.join(output_dir, test_name + '.v')
+        with open(f, 'rb') as source_file:
+            content = source_file.read()
+        with open(output_file, "wb") as dest_file:
+            dest_file.write(
+                header_ChiBench.format(name=test_name).encode('utf-8'))
+            dest_file.write(content)
+
+        count += 1
+    print(f"Copied {count} ChiBench tests to {output_dir}")
+
+if (run_ChiGen):
+
+    os.makedirs(output_dir, exist_ok=True)
+    limit = 50
+    count = 0
+    for f in glob.glob(os.path.join(chimera_root, "3k_programs_for_bugs",
+                                    "chigen", '*.v')):
+        if count >= limit:
+            break
+
+        filename = os.path.basename(f)
+        test_name = os.path.splitext(filename)[0]
+        output_file = os.path.join(output_dir, test_name + '.v')
+        with open(f, 'rb') as source_file:
+            content = source_file.read()
+        with open(output_file, "wb") as dest_file:
+            dest_file.write(
+                header_ChiGen.format(name=test_name).encode('utf-8'))
+            dest_file.write(content)
+
+        count += 1
+    print(f"Copied {count} ChiGen tests to {output_dir}")
+    build_dir = os.path.join(chimera_root, 'build')
+    chimera_bin = os.path.join(chimera_root, 'build', 'Chimera')
