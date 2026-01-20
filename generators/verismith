@@ -61,27 +61,26 @@ def main():
     if not verismith_bin:
         # Check for cabal
         if shutil.which("cabal"):
-            print("Verismith binary not found. Attempting to build with 'cabal build'...")
+            print(
+                "Verismith binary not found. Attempting to build with 'cabal build'..."
+            )
             try:
                 # Attempt to build
                 subprocess.check_call(
                     ["cabal", "update"],
                     cwd=verismith_dir,
                     stdout=sys.stdout,
-                    stderr=sys.stderr
-                )
+                    stderr=sys.stderr)
                 subprocess.check_call(
                     ["cabal", "configure"],
                     cwd=verismith_dir,
                     stdout=sys.stdout,
-                    stderr=sys.stderr
-                )
+                    stderr=sys.stderr)
                 subprocess.check_call(
                     ["cabal", "build"],
                     cwd=verismith_dir,
                     stdout=sys.stdout,
-                    stderr=sys.stderr
-                )
+                    stderr=sys.stderr)
 
                 # Search again after build
                 candidates = glob.glob(pattern, recursive=True)
@@ -89,7 +88,9 @@ def main():
                     verismith_bin = os.path.abspath(candidates[0])
                     print(f"Build successful. Found binary: {verismith_bin}")
                 else:
-                    print(f"Error: 'cabal build' succeeded but binary not found with pattern: {pattern}")
+                    print(
+                        f"Error: 'cabal build' succeeded but binary not found with pattern: {pattern}"
+                    )
                     sys.exit(1)
             except subprocess.CalledProcessError:
                 print("Error: 'cabal build' failed.")
