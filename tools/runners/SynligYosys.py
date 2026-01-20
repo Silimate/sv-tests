@@ -47,9 +47,7 @@ class SynligYosys(BaseRunner):
                     f'# Verismith test case: evaluation will be done using ./verismith equiv\n'
                 )
                 for svf in params['files']:
-                    f.write(
-                        f'read_verilog {defer} {nodisplay} {inc} {defs} {svf}\n'
-                    )
+                    f.write(f"read_verilog {svf}\n")
 
                 if mode not in ["preprocessing", "parsing"]:
                     f.write("synth;\n")
