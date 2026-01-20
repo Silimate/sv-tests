@@ -65,12 +65,24 @@ def main():
             try:
                 # Attempt to build
                 subprocess.check_call(
+                    ["cabal", "update"],
+                    cwd=verismith_dir,
+                    stdout=sys.stdout,
+                    stderr=sys.stderr
+                )
+                subprocess.check_call(
+                    ["cabal", "configure"],
+                    cwd=verismith_dir,
+                    stdout=sys.stdout,
+                    stderr=sys.stderr
+                )
+                subprocess.check_call(
                     ["cabal", "build"],
                     cwd=verismith_dir,
                     stdout=sys.stdout,
                     stderr=sys.stderr
                 )
-                
+
                 # Search again after build
                 candidates = glob.glob(pattern, recursive=True)
                 if candidates:
