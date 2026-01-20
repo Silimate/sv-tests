@@ -35,78 +35,116 @@ class SynligYosys(BaseRunner):
         runner_scr = os.path.join(tmp_dir, "scr.sh")
         yosys_scr = os.path.join(tmp_dir, "yosys-script")
         mode = params['mode']
-
         top = params['top_module'] or None
 
-        # generate yosys script
-        with open(yosys_scr, "w") as f:
-            f.write("plugin -i systemverilog\n")
-            f.write(
-                "read_systemverilog -nopython -parse -sverilog -nonote -noinfo -nowarning -DSYNTHESIS"
-            )
+        # Check for Verismith tag
+        is_verismith = "tags" in params and "verismith" in params["tags"]
 
-            if mode != "elaboration":
-                f.write(" -parse-only")
+        if is_verismith:
+            # === Verismith Workflow ===
+            with open(yosys_scr, "w") as f:
+                f.write("plugin -i systemverilog\n")
+                f.write("read_systemverilog -nopython -parse -sverilog -nonote -noinfo -nowarning -DSYNTHESIS")
 
-            if top is not None:
-                f.write(f' --top-module {top}')
+                if mode != "elaboration":
+                    f.write(" -parse-only")
 
-            if mode in ["parsing", "preprocessing"]:
-                f.write(' -noelab')
-
-            for i in params["incdirs"]:
-                f.write(f" -I{i}")
-
-            for d in params["defines"]:
-                f.write(f" -D{d}")
-
-            for fn in params["files"]:
-                f.write(f" {fn}")
-
-            f.write("\n")
-
-            if mode == "elaboration":
-                # prep (without optimizations)
                 if top is not None:
-                    f.write(f"hierarchy -top \\{top}\n")
-                else:
-                    f.write("hierarchy -auto-top\n")
+                    f.write(f' --top-module {top}')
 
-                f.write(
-                    "proc\n"
-                    "check\n"
-                    "memory_dff\n"
-                    "memory_collect\n"
-                    "stat\n"
-                    "stat\n"
-                    "check\n")
-            
-            # Verismith Integration
-            is_verismith = "tags" in params and "verismith" in params["tags"]
-            if is_verismith and mode not in ["preprocessing", "parsing"]:
-                 # We need to tell Yosys to output a netlist
-                 f.write("write_verilog -noattr syn.v\n")
+                if mode in ["parsing", "preprocessing"]:
+                    f.write(' -noelab')
 
-        # generate runner script
-        with open(runner_scr, "w") as f:
-            f.write("set -e\n")
-            f.write("set -x\n")
-            f.write(f"cat {yosys_scr}\n")
-            f.write(f"{self.executable} -s {yosys_scr}\n")
+                for i in params["incdirs"]:
+                    f.write(f" -I{i}")
 
-            if is_verismith and mode not in ["preprocessing", "parsing"]:
-                # Run Equivalence Check
-                # Find binary
-                bin_path = Verismith.find_binary()
-                if bin_path:
-                    test_file = params['files'][0]
-                    abs_test_file = os.path.abspath(test_file)
-                    abs_syn_file = "syn.v"
-                    
-                    cmd = Verismith.get_equiv_cmd(bin_path, abs_test_file, abs_syn_file)
-                    cmd_str = " ".join(cmd)
-                    f.write(f"{cmd_str}\n")
-                else:
-                    f.write("echo 'Verismith binary not found, skipping equiv check'\n")
+                for d in params["defines"]:
+                    f.write(f" -D{d}")
+
+                for fn in params["files"]:
+                    f.write(f" {fn}")
+
+                f.write("\n")
+
+                if mode == "elaboration":
+                    if top is not None:
+                        f.write(f"hierarchy -top \\{top}\n")
+                    else:
+                        f.write("hierarchy -auto-top\n")
+
+                    f.write(
+                        "proc\n"
+                        "check\n"
+                        "memory_dff\n"
+                        "memory_collect\n"
+                        "stat\n"
+                        "stat\n"
+                        "check\n")
+                    # Verismith: Force output netlist
+                    f.write("write_verilog -noattr syn.v\n")
+
+            with open(runner_scr, "w") as f:
+                f.write("set -e\n")
+                f.write("set -x\n")
+                f.write(f"cat {yosys_scr}\n")
+                f.write(f"{self.executable} -s {yosys_scr}\n")
+
+                if mode not in ["preprocessing", "parsing"]:
+                    bin_path = Verismith.find_binary()
+                    if bin_path:
+                        test_file = params['files'][0]
+                        abs_test_file = os.path.abspath(test_file)
+                        abs_syn_file = "syn.v"
+                        cmd = Verismith.get_equiv_cmd(bin_path, abs_test_file, abs_syn_file)
+                        f.write(f"{' '.join(cmd)}\n")
+                    else:
+                        f.write("echo 'Verismith binary not found, skipping equiv check'\n")
+
+        else:
+            # === Normal Workflow ===
+            with open(yosys_scr, "w") as f:
+                f.write("plugin -i systemverilog\n")
+                f.write("read_systemverilog -nopython -parse -sverilog -nonote -noinfo -nowarning -DSYNTHESIS")
+
+                if mode != "elaboration":
+                    f.write(" -parse-only")
+
+                if top is not None:
+                    f.write(f' --top-module {top}')
+
+                if mode in ["parsing", "preprocessing"]:
+                    f.write(' -noelab')
+
+                for i in params["incdirs"]:
+                    f.write(f" -I{i}")
+
+                for d in params["defines"]:
+                    f.write(f" -D{d}")
+
+                for fn in params["files"]:
+                    f.write(f" {fn}")
+
+                f.write("\n")
+
+                if mode == "elaboration":
+                    if top is not None:
+                        f.write(f"hierarchy -top \\{top}\n")
+                    else:
+                        f.write("hierarchy -auto-top\n")
+
+                    f.write(
+                        "proc\n"
+                        "check\n"
+                        "memory_dff\n"
+                        "memory_collect\n"
+                        "stat\n"
+                        "stat\n"
+                        "check\n")
+
+            with open(runner_scr, "w") as f:
+                f.write("set -e\n")
+                f.write("set -x\n")
+                f.write(f"cat {yosys_scr}\n")
+                f.write(f"{self.executable} -s {yosys_scr}\n")
 
         self.cmd = ["sh", runner_scr]
