@@ -11,6 +11,7 @@
 
 import os
 import sys
+from Verismith import Verismith
 
 from BaseRunner import BaseRunner
 
@@ -77,7 +78,14 @@ class SynligYosys(BaseRunner):
                     "memory_dff\n"
                     "memory_collect\n"
                     "stat\n"
+                    "stat\n"
                     "check\n")
+            
+            # Verismith Integration
+            is_verismith = "tags" in params and "verismith" in params["tags"]
+            if is_verismith and mode not in ["preprocessing", "parsing"]:
+                 # We need to tell Yosys to output a netlist
+                 f.write("write_verilog -noattr syn.v\n")
 
         # generate runner script
         with open(runner_scr, "w") as f:
@@ -85,5 +93,20 @@ class SynligYosys(BaseRunner):
             f.write("set -x\n")
             f.write(f"cat {yosys_scr}\n")
             f.write(f"{self.executable} -s {yosys_scr}\n")
+
+            if is_verismith and mode not in ["preprocessing", "parsing"]:
+                # Run Equivalence Check
+                # Find binary
+                bin_path = Verismith.find_binary()
+                if bin_path:
+                    test_file = params['files'][0]
+                    abs_test_file = os.path.abspath(test_file)
+                    abs_syn_file = "syn.v"
+                    
+                    cmd = Verismith.get_equiv_cmd(bin_path, abs_test_file, abs_syn_file)
+                    cmd_str = " ".join(cmd)
+                    f.write(f"{cmd_str}\n")
+                else:
+                    f.write("echo 'Verismith binary not found, skipping equiv check'\n")
 
         self.cmd = ["sh", runner_scr]
