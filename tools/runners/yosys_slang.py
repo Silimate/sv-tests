@@ -102,24 +102,14 @@ class yosys_slang(BaseRunner):
             # === Verismith Workflow ===
             # generate yosys script with write_verilog
             with open(yosys_scr, "w") as f:
+                f.write(
+                    f'# Verismith test case: eveluation will be done using ./verismith equiv\n'
+                )
                 f.write("plugin -i slang\n")
                 f.write(f"read_slang {' '.join(slang_cmd)}\n")
 
-                # prep (without optimizations)
-                if top is not None:
-                    f.write(f"hierarchy -top \\{top}\n")
-                else:
-                    f.write("hierarchy -auto-top\n")
-                f.write(
-                    "proc\n"
-                    "check\n"
-                    "memory_dff\n"
-                    "memory_collect\n"
-                    "stat\n"
-                    "check\n")
-                f.write(
-                    "write_verilog -noattr syn.v\n"
-                )  # Verismith: Force output netlist
+                f.write("synth;\n")
+                f.write("write_verilog -noattr syn.v\n")
 
             # Use wrapper script for equiv check
             runner_scr = os.path.join(tmp_dir, "scr.sh")

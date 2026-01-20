@@ -43,46 +43,16 @@ class SynligYosys(BaseRunner):
         if is_verismith:
             # === Verismith Workflow ===
             with open(yosys_scr, "w") as f:
-                f.write("plugin -i systemverilog\n")
                 f.write(
-                    "read_systemverilog -nopython -parse -sverilog -nonote -noinfo -nowarning -DSYNTHESIS"
+                    f'# Verismith test case: eveluation will be done using ./verismith equiv\n'
                 )
-
-                if mode != "elaboration":
-                    f.write(" -parse-only")
-
-                if top is not None:
-                    f.write(f' --top-module {top}')
-
-                if mode in ["parsing", "preprocessing"]:
-                    f.write(' -noelab')
-
-                for i in params["incdirs"]:
-                    f.write(f" -I{i}")
-
-                for d in params["defines"]:
-                    f.write(f" -D{d}")
-
-                for fn in params["files"]:
-                    f.write(f" {fn}")
-
-                f.write("\n")
-
-                if mode == "elaboration":
-                    if top is not None:
-                        f.write(f"hierarchy -top \\{top}\n")
-                    else:
-                        f.write("hierarchy -auto-top\n")
-
+                for svf in params['files']:
                     f.write(
-                        "proc\n"
-                        "check\n"
-                        "memory_dff\n"
-                        "memory_collect\n"
-                        "stat\n"
-                        "stat\n"
-                        "check\n")
-                    # Verismith: Force output netlist
+                        f'read_verilog {defer} {nodisplay} {inc} {defs} {svf}\n'
+                    )
+
+                if mode not in ["preprocessing", "parsing"]:
+                    f.write("synth;\n")
                     f.write("write_verilog -noattr syn.v\n")
 
             with open(runner_scr, "w") as f:

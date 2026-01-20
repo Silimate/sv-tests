@@ -77,7 +77,6 @@ class Yosys(BaseRunner):
 
                 if mode not in ["preprocessing", "parsing"]:
                     f.write("synth;\n")
-                    # Verismith: Force output netlist
                     f.write("write_verilog -noattr syn.v\n")
 
             with open(run, 'w') as f:

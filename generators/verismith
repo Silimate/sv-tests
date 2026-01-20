@@ -19,6 +19,8 @@ import shutil
 import subprocess
 import sys
 
+num_tests = 50
+
 
 def main():
     try:
@@ -99,7 +101,6 @@ def main():
             print("Error: 'cabal' not found and Verismith binary missing.")
             sys.exit(1)
 
-    num_tests = 5
     for i in range(num_tests):
         test_name = f"verismith_{i}"
         filename = f"{test_name}.v"
