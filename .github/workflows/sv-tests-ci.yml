@@ -31,7 +31,7 @@ jobs:
             deps: autoconf autotools-dev bison flex help2man libfl-dev libelf-dev clang cabal-install
             make_jobs_max: 4
           - name: yosys
-            deps: bison clang tcl-dev flex libfl-dev pkg-config libreadline-dev cabal
+            deps: bison clang tcl-dev flex libfl-dev pkg-config libreadline-dev cabal-install
           - name: yosys-slang
             deps: bison clang tcl-dev flex libfl-dev pkg-config libreadline-dev cmake pkg-config cabal-install
             submodules: third_party/slang third_party/fmt
