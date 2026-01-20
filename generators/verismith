@@ -117,7 +117,6 @@ def main():
 :description: Verismith generated test {i}
 :tags: verismith
 :type: simulation elaboration parsing
-:runner: verismith_equiv
 */
 """
         with open(filepath, "w") as f:
