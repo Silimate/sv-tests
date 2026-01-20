@@ -37,8 +37,6 @@ class Yosys(BaseRunner):
         run = os.path.join(tmp_dir, "run.sh")
         scr = os.path.join(tmp_dir, 'scr.ys')
         mode = params['mode']
-        
-        # Common Yosys script generation
         defer = ""
         if mode in ["preprocessing", "parsing"]:
             defer = "-defer"
@@ -61,69 +59,53 @@ class Yosys(BaseRunner):
         for define in params['defines']:
             defs += f' -D {define}'
 
-        # Check for Verismith tag
-        is_verismith = "tags" in params and "verismith" in params["tags"]
+        # prepare yosys script
+        with open(scr, 'w') as f:
+            for svf in params['files']:
+                f.write(
+                    f'read_verilog {defer} -sv {nodisplay} {inc} {defs} {svf}\n'
+                )
 
-        if is_verismith:
-            # === Verismith Workflow ===
-            with open(scr, 'w') as f:
-                for svf in params['files']:
-                    f.write(f'read_verilog {defer} -sv {nodisplay} {inc} {defs} {svf}\n')
+            if mode not in ["preprocessing", "parsing"]:
+                # prep (without optimizations)
+                f.write(
+                    f"hierarchy {top_opt}\n"
+                    "proc\n"
+                    "check\n"
+                    "clean\n"
+                    "memory_dff\n"
+                    "memory_collect\n"
+                    "stat\n"
+                    "check\n")
+            if mode in ['simulation', 'simulation_without_run']:
+                f.write("sim -assert\n")
 
-                if mode not in ["preprocessing", "parsing"]:
-                     f.write(
-                        f"hierarchy {top_opt}\n"
-                        "proc\n"
-                        "check\n"
-                        "clean\n"
-                        "memory_dff\n"
-                        "memory_collect\n"
-                        "stat\n"
-                        "check\n")
-                     # Verismith: Force output netlist
-                     f.write("write_verilog -noattr syn.v\n")
+        # prepare wrapper script
+        with open(run, 'w') as f:
+            f.write('set -x\n')
+            f.write(f'cat {scr}\n')
+            f.write(f'{self.executable} -Q -T {scr}\n')
+
+            # Verismith Integration
+            is_verismith = "tags" in params and "verismith" in params["tags"]
+            if is_verismith and mode not in ["preprocessing", "parsing"]:
+                 # We need to tell Yosys to output a netlist
+                 with open(scr, 'a') as ys:
+                     ys.write("write_verilog -noattr syn.v\n")
             
-            with open(run, 'w') as f:
-                f.write('set -e\n')
-                f.write('set -x\n')
-                f.write(f'cat {scr}\n')
-                f.write(f'{self.executable} -Q -T {scr}\n')
-                
-                if mode not in ["preprocessing", "parsing"]:
-                    bin_path = Verismith.find_binary()
-                    if bin_path:
-                        test_file = params['files'][0]
-                        abs_test_file = os.path.abspath(test_file)
-                        abs_syn_file = "syn.v"
-                        cmd = Verismith.get_equiv_cmd(bin_path, abs_test_file, abs_syn_file)
-                        f.write(f"{' '.join(cmd)}\n")
-                    else:
-                        f.write("echo 'Verismith binary not found, skipping equiv check'\n")
-
-        else:
-            # === Normal Workflow ===
-            with open(scr, 'w') as f:
-                for svf in params['files']:
-                    f.write(f'read_verilog {defer} -sv {nodisplay} {inc} {defs} {svf}\n')
-
-                if mode not in ["preprocessing", "parsing"]:
-                    f.write(
-                        f"hierarchy {top_opt}\n"
-                        "proc\n"
-                        "check\n"
-                        "clean\n"
-                        "memory_dff\n"
-                        "memory_collect\n"
-                        "stat\n"
-                        "check\n")
-                if mode in ['simulation', 'simulation_without_run']:
-                    f.write("sim -assert\n")
-            
-            with open(run, 'w') as f:
-                f.write('set -e\n')
-                f.write('set -x\n')
-                f.write(f'cat {scr}\n')
-                f.write(f'{self.executable} -Q -T {scr}\n')
+                 # Run Equivalence Check
+                 # Find binary
+                 bin_path = Verismith.find_binary()
+                 if bin_path:
+                     test_file = params['files'][0]
+                     abs_test_file = os.path.abspath(test_file)
+                     abs_syn_file = "syn.v"
+                     
+                     cmd = Verismith.get_equiv_cmd(bin_path, abs_test_file, abs_syn_file)
+                     cmd_str = " ".join(cmd)
+                     f.write(f"{cmd_str}\n")
+                 else:
+                     f.write("echo 'Verismith binary not found, skipping equiv check'\n")
 
         self.cmd = ['sh', run]
 
