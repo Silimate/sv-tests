@@ -47,7 +47,6 @@ def main():
     use_cabal = False
     print(verismith_bin)
     if not verismith_bin:
-        print("dcslkn vsds vsddf")
         # Check for pre-built binary in known location
         # This path depends on the architecture/OS/GHC version, so we glob for it
         # Pattern: dist-newstyle/build/**/x/verismith/build/verismith/verismith
