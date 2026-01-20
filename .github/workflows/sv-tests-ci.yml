@@ -18,7 +18,7 @@ jobs:
           - name: icarus
             deps: autoconf autotools-dev bison flex libfl-dev gperf clang cabal-install
           - name: slang
-            deps: cmake pkg-config clang
+            deps: cmake pkg-config clang cabal-install
           # - name: surelog
           #   repo: Surelog
           #   submodules: third_party/UHDM third_party/antlr4 third_party/googletest
