@@ -256,6 +256,7 @@ class BaseRunner:
         regex = re.compile(r'module\s+(\w+)\s*[#(;]')
         for fn in params['files']:
             with open(fn) as f:
+
                 try:
                     m = regex.search(f.read())
                 except UnicodeDecodeError:

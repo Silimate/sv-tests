@@ -44,7 +44,9 @@ class SynligYosys(BaseRunner):
             # === Verismith Workflow ===
             with open(yosys_scr, "w") as f:
                 f.write("plugin -i systemverilog\n")
-                f.write("read_systemverilog -nopython -parse -sverilog -nonote -noinfo -nowarning -DSYNTHESIS")
+                f.write(
+                    "read_systemverilog -nopython -parse -sverilog -nonote -noinfo -nowarning -DSYNTHESIS"
+                )
 
                 if mode != "elaboration":
                     f.write(" -parse-only")
@@ -86,6 +88,9 @@ class SynligYosys(BaseRunner):
             with open(runner_scr, "w") as f:
                 f.write("set -e\n")
                 f.write("set -x\n")
+                # Verismith: Add root dir to PATH to find 'timeout' shim
+                verismith_root = Verismith.get_root_dir()
+                f.write(f'export PATH="{verismith_root}:$PATH"\n')
                 f.write(f"cat {yosys_scr}\n")
                 f.write(f"{self.executable} -s {yosys_scr}\n")
 
@@ -95,16 +100,22 @@ class SynligYosys(BaseRunner):
                         test_file = params['files'][0]
                         abs_test_file = os.path.abspath(test_file)
                         abs_syn_file = "syn.v"
-                        cmd = Verismith.get_equiv_cmd(bin_path, abs_test_file, abs_syn_file)
+                        cmd = Verismith.get_equiv_cmd(
+                            bin_path, abs_test_file, abs_syn_file)
                         f.write(f"{' '.join(cmd)}\n")
                     else:
-                        f.write("echo 'Verismith binary not found, skipping equiv check'\n")
+                        f.write(
+                            "echo 'Verismith binary not found, failing test'\n"
+                        )
+                        f.write("exit 1\n")
 
         else:
             # === Normal Workflow ===
             with open(yosys_scr, "w") as f:
                 f.write("plugin -i systemverilog\n")
-                f.write("read_systemverilog -nopython -parse -sverilog -nonote -noinfo -nowarning -DSYNTHESIS")
+                f.write(
+                    "read_systemverilog -nopython -parse -sverilog -nonote -noinfo -nowarning -DSYNTHESIS"
+                )
 
                 if mode != "elaboration":
                     f.write(" -parse-only")

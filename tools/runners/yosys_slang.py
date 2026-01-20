@@ -11,6 +11,7 @@
 
 import os
 import sys
+from Verismith import Verismith
 
 from BaseRunner import BaseRunner
 
@@ -94,22 +95,78 @@ class yosys_slang(BaseRunner):
 
         slang_cmd += params['files']
 
-        # generate yosys script
-        with open(yosys_scr, "w") as f:
-            f.write("plugin -i slang\n")
-            f.write(f"read_slang {' '.join(slang_cmd)}\n")
+        # Check for Verismith tag
+        is_verismith = "tags" in params and "verismith" in params["tags"]
 
-            # prep (without optimizations)
-            if top is not None:
-                f.write(f"hierarchy -top \\{top}\n")
-            else:
-                f.write("hierarchy -auto-top\n")
-            f.write(
-                "proc\n"
-                "check\n"
-                "memory_dff\n"
-                "memory_collect\n"
-                "stat\n"
-                "check\n")
+        if is_verismith:
+            # === Verismith Workflow ===
+            # generate yosys script with write_verilog
+            with open(yosys_scr, "w") as f:
+                f.write("plugin -i slang\n")
+                f.write(f"read_slang {' '.join(slang_cmd)}\n")
 
-        self.cmd = [self.executable, "-s", yosys_scr]
+                # prep (without optimizations)
+                if top is not None:
+                    f.write(f"hierarchy -top \\{top}\n")
+                else:
+                    f.write("hierarchy -auto-top\n")
+                f.write(
+                    "proc\n"
+                    "check\n"
+                    "memory_dff\n"
+                    "memory_collect\n"
+                    "stat\n"
+                    "check\n")
+                f.write(
+                    "write_verilog -noattr syn.v\n"
+                )  # Verismith: Force output netlist
+
+            # Use wrapper script for equiv check
+            runner_scr = os.path.join(tmp_dir, "scr.sh")
+            with open(runner_scr, "w") as f:
+                f.write("set -e\n")
+                f.write("set -x\n")
+                # Verismith: Add root dir to PATH to find 'timeout' shim
+                verismith_root = Verismith.get_root_dir()
+                f.write(f'export PATH="{verismith_root}:$PATH"\n')
+                f.write(f"cat {yosys_scr}\n")
+                f.write(f"{self.executable} -s {yosys_scr}\n")
+
+                if mode not in ["preprocessing", "parsing"]:
+                    bin_path = Verismith.find_binary()
+                    if bin_path:
+                        test_file = params['files'][0]
+                        abs_test_file = os.path.abspath(test_file)
+                        abs_syn_file = "syn.v"
+                        cmd = Verismith.get_equiv_cmd(
+                            bin_path, abs_test_file, abs_syn_file)
+                        f.write(f"{' '.join(cmd)}\n")
+                    else:
+                        f.write(
+                            "echo 'Verismith binary not found, failing test'\n"
+                        )
+                        f.write("exit 1\n")
+
+            self.cmd = ["sh", runner_scr]
+
+        else:
+            # === Normal Workflow ===
+            # generate yosys script
+            with open(yosys_scr, "w") as f:
+                f.write("plugin -i slang\n")
+                f.write(f"read_slang {' '.join(slang_cmd)}\n")
+
+                # prep (without optimizations)
+                if top is not None:
+                    f.write(f"hierarchy -top \\{top}\n")
+                else:
+                    f.write("hierarchy -auto-top\n")
+                f.write(
+                    "proc\n"
+                    "check\n"
+                    "memory_dff\n"
+                    "memory_collect\n"
+                    "stat\n"
+                    "check\n")
+
+            self.cmd = [self.executable, "-s", yosys_scr]

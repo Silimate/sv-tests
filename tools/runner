@@ -120,7 +120,7 @@ test_params = {}
 
 # look for all supported params
 try:
-    with open(test) as f:
+    with open(test, errors="ignore") as f:
         for l in f:
             param = re.search(r"^:([a-zA-Z_-]+):\s*(.+)", l)
 
