@@ -1,4 +1,5 @@
 out
+output
 build
 tests/generated
 __pycache__
