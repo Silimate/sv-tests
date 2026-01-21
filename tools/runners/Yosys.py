@@ -68,7 +68,7 @@ class Yosys(BaseRunner):
             # === Verismith Workflow ===
             with open(scr, 'w') as f:
                 f.write(
-                    f'# Verismith test case: eveluation will be done using ./verismith equiv\n'
+                    f'# Verismith test case: evaluation will be done using ./verismith equiv\n'
                 )
                 for svf in params['files']:
                     f.write(
