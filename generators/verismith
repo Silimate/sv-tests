@@ -1,0 +1,150 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2021 The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier: ISC
+"""
+Generator script for Verismith tests.
+This script invokes the verismith generation process and wraps the resulting
+Verilog files for sv-tests.
+"""
+
+import os
+import shutil
+import subprocess
+import sys
+
+num_tests = 50
+
+
+def main():
+    try:
+        third_party_dir = os.environ["THIRD_PARTY_DIR"]
+        tests_dir = os.environ["TESTS_DIR"]
+    except KeyError:
+        print(
+            "Error: TESTS_DIR and THIRD_PARTY_DIR environment variables must be set"
+        )
+        sys.exit(1)
+
+    verismith_dir = os.path.join(third_party_dir, "tests", "verismith")
+    if not os.path.isdir(verismith_dir):
+        print(f"Error: Verismith directory not found at {verismith_dir}")
+        sys.exit(1)
+
+    output_dir = os.path.join(tests_dir, "generated", "verismith")
+    os.makedirs(output_dir, exist_ok=True)
+
+    print(f"Generating Verismith samples in {output_dir}")
+
+    # Try to find verismith executable
+    verismith_bin = os.environ.get("VERISMITH_BIN")
+    use_cabal = False
+    print(verismith_bin)
+    if not verismith_bin:
+        # Check for pre-built binary in known location
+        # This path depends on the architecture/OS/GHC version, so we glob for it
+        # Pattern: dist-newstyle/build/**/x/verismith/build/verismith/verismith
+        import glob
+        pattern = os.path.join(
+            verismith_dir, "dist-newstyle", "build", "**", "x", "verismith",
+            "build", "verismith", "verismith")
+        candidates = glob.glob(pattern, recursive=True)
+        if candidates:
+            verismith_bin = os.path.abspath(candidates[0])
+            print(f"Found pre-built verismith binary: {verismith_bin}")
+
+    if not verismith_bin:
+        # Check for cabal
+        if shutil.which("cabal"):
+            print(
+                "Verismith binary not found. Attempting to build with 'cabal build'..."
+            )
+            try:
+                # Attempt to build
+                subprocess.check_call(
+                    ["cabal", "update"],
+                    cwd=verismith_dir,
+                    stdout=sys.stdout,
+                    stderr=sys.stderr)
+                subprocess.check_call(
+                    ["cabal", "configure"],
+                    cwd=verismith_dir,
+                    stdout=sys.stdout,
+                    stderr=sys.stderr)
+                subprocess.check_call(
+                    ["cabal", "build"],
+                    cwd=verismith_dir,
+                    stdout=sys.stdout,
+                    stderr=sys.stderr)
+
+                # Search again after build
+                candidates = glob.glob(pattern, recursive=True)
+                if candidates:
+                    verismith_bin = os.path.abspath(candidates[0])
+                    print(f"Build successful. Found binary: {verismith_bin}")
+                else:
+                    print(
+                        f"Error: 'cabal build' succeeded but binary not found with pattern: {pattern}"
+                    )
+                    sys.exit(1)
+            except subprocess.CalledProcessError:
+                print("Error: 'cabal build' failed.")
+                sys.exit(1)
+        else:
+            print("Error: 'cabal' not found and Verismith binary missing.")
+            sys.exit(1)
+
+    for i in range(num_tests):
+        test_name = f"verismith_{i}"
+        filename = f"{test_name}.v"
+        filepath = os.path.abspath(os.path.join(output_dir, filename))
+
+        # Generate the Verilog file
+        try:
+            if use_cabal:
+                cmd = [
+                    "cabal", "run", "verismith", "--", "generate", "-o",
+                    filepath
+                ]
+            else:
+                cmd = [verismith_bin, "generate", "-o", filepath]
+
+            subprocess.check_call(
+                cmd,
+                cwd=verismith_dir,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError as e:
+            print(f"Error generating {filename}: {e}")
+            continue
+
+        # Add sv-tests wrapper metadata to the beginning of the file
+        if not os.path.exists(filepath):
+            print(f"Warning: {filepath} was not created.")
+            continue
+
+        with open(filepath, "r") as f:
+            content = f.read()
+
+        # Simple verification tag
+        header = f"""/*
+:name: {test_name}
+:description: Verismith generated test {i}
+:tags: verismith
+:type: simulation elaboration parsing
+*/
+"""
+        with open(filepath, "w") as f:
+            f.write(header + content)
+
+    print(f"Successfully generated {num_tests} tests in {output_dir}")
+
+
+if __name__ == "__main__":
+    main()

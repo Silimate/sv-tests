@@ -10,6 +10,8 @@
 # SPDX-License-Identifier: ISC
 
 import os
+import sys
+from Verismith import Verismith
 
 from BaseRunner import BaseRunner
 
@@ -35,6 +37,8 @@ class Yosys(BaseRunner):
         run = os.path.join(tmp_dir, "run.sh")
         scr = os.path.join(tmp_dir, 'scr.ys')
         mode = params['mode']
+
+        # Common Yosys script generation
         defer = ""
         if mode in ["preprocessing", "parsing"]:
             defer = "-defer"
@@ -57,32 +61,74 @@ class Yosys(BaseRunner):
         for define in params['defines']:
             defs += f' -D {define}'
 
-        # prepare yosys script
-        with open(scr, 'w') as f:
-            for svf in params['files']:
+        # Check for Verismith tag
+        is_verismith = "tags" in params and "verismith" in params["tags"]
+
+        if is_verismith:
+            # === Verismith Workflow ===
+            with open(scr, 'w') as f:
                 f.write(
-                    f'read_verilog {defer} -sv {nodisplay} {inc} {defs} {svf}\n'
+                    f'# Verismith test case: evaluation will be done using ./verismith equiv\n'
                 )
+                for svf in params['files']:
+                    f.write(
+                        f'read_verilog {defer} {nodisplay} {inc} {defs} {svf}\n'
+                    )
 
-            if mode not in ["preprocessing", "parsing"]:
-                # prep (without optimizations)
-                f.write(
-                    f"hierarchy {top_opt}\n"
-                    "proc\n"
-                    "check\n"
-                    "clean\n"
-                    "memory_dff\n"
-                    "memory_collect\n"
-                    "stat\n"
-                    "check\n")
-            if mode in ['simulation', 'simulation_without_run']:
-                f.write("sim -assert\n")
+                if mode not in ["preprocessing", "parsing"]:
+                    f.write("synth;\n")
+                    f.write("write_verilog -noattr syn.v\n")
 
-        # prepare wrapper script
-        with open(run, 'w') as f:
-            f.write('set -x\n')
-            f.write(f'cat {scr}\n')
-            f.write(f'{self.executable} -Q -T {scr}\n')
+            with open(run, 'w') as f:
+                f.write('set -e\n')
+                f.write('set -x\n')
+                # Verismith: Add root dir to PATH to find 'timeout' shim
+                verismith_root = Verismith.get_root_dir()
+                f.write(f'export PATH="{verismith_root}:$PATH"\n')
+                f.write(f'cat {scr}\n')
+                f.write(f'{self.executable} -Q -T {scr}\n')
+
+                if mode not in ["preprocessing", "parsing"]:
+                    bin_path = Verismith.find_binary()
+                    if bin_path:
+                        test_file = params['files'][0]
+                        abs_test_file = os.path.abspath(test_file)
+                        abs_syn_file = "syn.v"
+                        cmd = Verismith.get_equiv_cmd(
+                            bin_path, abs_test_file, abs_syn_file)
+                        f.write(f"{' '.join(cmd)}\n")
+                    else:
+                        f.write(
+                            "echo 'Verismith binary not found, failing test'\n"
+                        )
+                        f.write("exit 1\n")
+
+        else:
+            # === Normal Workflow ===
+            with open(scr, 'w') as f:
+                for svf in params['files']:
+                    f.write(
+                        f'read_verilog {defer} -sv {nodisplay} {inc} {defs} {svf}\n'
+                    )
+
+                if mode not in ["preprocessing", "parsing"]:
+                    f.write(
+                        f"hierarchy {top_opt}\n"
+                        "proc\n"
+                        "check\n"
+                        "clean\n"
+                        "memory_dff\n"
+                        "memory_collect\n"
+                        "stat\n"
+                        "check\n")
+                if mode in ['simulation', 'simulation_without_run']:
+                    f.write("sim -assert\n")
+
+            with open(run, 'w') as f:
+                f.write('set -e\n')
+                f.write('set -x\n')
+                f.write(f'cat {scr}\n')
+                f.write(f'{self.executable} -Q -T {scr}\n')
 
         self.cmd = ['sh', run]
 

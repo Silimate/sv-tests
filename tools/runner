@@ -120,7 +120,7 @@ test_params = {}
 
 # look for all supported params
 try:
-    with open(test) as f:
+    with open(test, errors="ignore") as f:
         for l in f:
             param = re.search(r"^:([a-zA-Z_-]+):\s*(.+)", l)
 
@@ -168,6 +168,7 @@ try:
                     "Required parameters missing ({}) in {}".format(
                         ", ".join(missing), args.test))
                 sys.exit(1)
+
 except Exception as e:
     logger.error("Unable to parse test file: {}".format(str(e)))
     sys.exit(1)
