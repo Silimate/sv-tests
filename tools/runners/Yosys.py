@@ -61,11 +61,31 @@ class Yosys(BaseRunner):
         for define in params['defines']:
             defs += f' -D {define}'
 
-        # Check for Verismith tag
         is_verismith = "tags" in params and "verismith" in params["tags"]
+        is_vloghammer = "tags" in params and "vloghammer" in params["tags"]
 
-        if is_verismith:
-            # === Verismith Workflow ===
+        if is_vloghammer:
+            test_name = params["name"]
+
+            basename = os.path.basename(test_name)
+            job_name = basename.replace(".v", "")
+
+            third_party_dir = os.path.abspath(os.environ["THIRD_PARTY_DIR"])
+            vloghammer_dir = os.path.join(third_party_dir, "tests", "vloghammer")
+            if not os.path.isdir(vloghammer_dir):
+                vloghammer_dir = os.path.join(
+                    third_party_dir, "test", "vloghammer")
+
+
+            with open(run, "w") as f:
+                f.write("set -x\n")
+                f.write(f"cd {vloghammer_dir}\n")
+                f.write(f"make syn_yosys DEPS=1 RTL_LIST={job_name}\n")
+                f.write(f"make check_yosys DEPS=1 RTL_LIST={job_name}\n")
+                f.write(f"cat check_yosys/{job_name}.txt\n")
+
+
+        elif is_verismith:
             with open(scr, 'w') as f:
                 f.write(
                     f'# Verismith test case: evaluation will be done using ./verismith equiv\n'
@@ -139,3 +159,33 @@ class Yosys(BaseRunner):
         version = super().get_version()
 
         return " ".join([self.name, version.split()[1]])
+
+
+    def is_success_returncode(self, rc, params):
+        if "tags" in params and "vloghammer" in params["tags"]:
+
+            if rc != 0:
+                return False
+
+            test_name = params["name"]
+            basename = os.path.basename(test_name)
+            job_name = basename.replace(".v", "")
+
+            third_party_dir = os.path.abspath(os.environ["THIRD_PARTY_DIR"])
+            vloghammer_dir = os.path.join(third_party_dir, "tests", "vloghammer")
+            if not os.path.isdir(vloghammer_dir):
+                vloghammer_dir = os.path.join(
+                    third_party_dir, "test", "vloghammer")
+
+            check_dir = os.path.join(vloghammer_dir, "check_yosys")
+            err_file = os.path.join(check_dir, f"{job_name}.err")
+            txt_file = os.path.join(check_dir, f"{job_name}.txt")
+
+            if os.path.exists(err_file):
+                return False
+
+            if os.path.exists(txt_file):
+                return True
+
+            return False
+        return rc == 0
