@@ -17,7 +17,6 @@ from BaseRunner import BaseRunner
 
 
 class Yosys(BaseRunner):
-
     def __init__(self):
         super().__init__(
             "yosys", "yosys", {
