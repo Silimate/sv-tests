@@ -13,7 +13,6 @@ from BaseRunner import BaseRunner
 
 
 class Odin(BaseRunner):
-
     def __init__(self):
         super().__init__("odin", "odin_II", {"preprocessing", "parsing"})
 

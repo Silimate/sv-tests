@@ -39,7 +39,6 @@ class BaseRunner:
     Runners must be located in tools/runners subdirectory
     to be detected and launched by the Makefile.
     """
-
     def __init__(
             self,
             name,

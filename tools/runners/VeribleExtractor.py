@@ -16,7 +16,6 @@ import shlex
 
 
 class VeribleExtractor(BaseRunner):
-
     def __init__(self):
         super().__init__(
             "verible_extractor", "verible-verilog-kythe-extractor",

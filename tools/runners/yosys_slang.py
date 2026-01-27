@@ -17,7 +17,6 @@ from BaseRunner import BaseRunner
 
 
 class yosys_slang(BaseRunner):
-
     def __init__(self):
         super().__init__("yosys-slang", "yosys-slang", {"elaboration"})
 

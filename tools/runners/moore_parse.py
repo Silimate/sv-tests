@@ -13,7 +13,6 @@ from runners.moore import moore
 
 
 class moore_parse(moore):
-
     def __init__(self):
         super().__init__("moore-parse", supported_features={'parsing'})
 

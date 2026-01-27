@@ -166,7 +166,6 @@ def numericSortKey(s: str):
 
 
 class ReportJinja2Env(jinja2.Environment):
-
     def __init__(self, include_dir: str):
         super().__init__(
             trim_blocks=True,
@@ -185,7 +184,6 @@ class ReportJinja2Env(jinja2.Environment):
 
     @staticmethod
     def escapeJsString(value: str):
-
         def esc(match: Match):
             return rf"\x{ord(match.group(0)):02x}"
 
@@ -207,7 +205,6 @@ class ReportJinja2Env(jinja2.Environment):
     # entries starting with a digit.
     @staticmethod
     def tagDictSort(d: Dict[str, Any]):
-
         def tagSortKey(s: str):
             if len(s) > 0 and s[0].isdigit():
                 return numericSortKey(s)
@@ -413,7 +410,6 @@ def convertPathsToRelativeLinks(text: str, relative_to: str):
     Returns:
       Text in which paths are replaced with HTML links.
     """
-
     def convertPath(match: Match):
         path: str = html.unescape(match.group(1))
         if not os.path.exists(path):
@@ -522,7 +518,6 @@ def renderTagResultsConfig(
 
 
 def collect_logs(runner_name: str):
-
     @dataclasses.dataclass
     class LocalPartialGroupData:
         group: PartialGroupData = dataclasses.field(

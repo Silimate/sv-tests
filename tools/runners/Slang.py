@@ -13,7 +13,6 @@ from BaseRunner import BaseRunner
 
 
 class Slang(BaseRunner):
-
     def __init__(
             self,
             name="slang",

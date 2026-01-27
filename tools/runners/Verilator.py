@@ -17,7 +17,6 @@ from BaseRunner import BaseRunner
 
 
 class Verilator(BaseRunner):
-
     def __init__(self):
         super().__init__(
             "verilator", "verilator", {

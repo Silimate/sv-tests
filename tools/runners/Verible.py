@@ -13,7 +13,6 @@ from BaseRunner import BaseRunner
 
 
 class Verible(BaseRunner):
-
     def __init__(self):
         super().__init__("verible", "verible-verilog-syntax", {"parsing"})
 

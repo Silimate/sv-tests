@@ -16,7 +16,6 @@ from BaseRunner import BaseRunner
 
 
 class tree_sitter_verilog(BaseRunner):
-
     def __init__(self):
         super().__init__("tree-sitter-verilog", "tree-sitter", {"parsing"})
 

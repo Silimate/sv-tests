@@ -14,7 +14,6 @@ import os
 
 
 class Icarus(BaseRunner):
-
     def __init__(self):
         super().__init__(
             'icarus', 'iverilog', {
