@@ -14,6 +14,7 @@ from BaseRunner import BaseRunner
 
 
 class moore(BaseRunner):
+
     def __init__(
             self,
             name="moore",

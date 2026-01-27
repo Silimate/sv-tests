@@ -13,6 +13,7 @@ from BaseRunner import BaseRunner
 
 
 class circt_verilog(BaseRunner):
+
     def __init__(
         self,
         name="circt-verilog",

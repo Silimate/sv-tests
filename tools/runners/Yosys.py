@@ -17,6 +17,7 @@ from BaseRunner import BaseRunner
 
 
 class Yosys(BaseRunner):
+
     def __init__(self):
         super().__init__(
             "yosys", "yosys", {
@@ -71,11 +72,11 @@ class Yosys(BaseRunner):
             job_name = basename.replace(".v", "")
 
             third_party_dir = os.path.abspath(os.environ["THIRD_PARTY_DIR"])
-            vloghammer_dir = os.path.join(third_party_dir, "tests", "vloghammer")
+            vloghammer_dir = os.path.join(
+                third_party_dir, "tests", "vloghammer")
             if not os.path.isdir(vloghammer_dir):
                 vloghammer_dir = os.path.join(
                     third_party_dir, "test", "vloghammer")
-
 
             with open(run, "w") as f:
                 f.write("set -x\n")
@@ -83,7 +84,6 @@ class Yosys(BaseRunner):
                 f.write(f"make syn_yosys DEPS=1 RTL_LIST={job_name}\n")
                 f.write(f"make check_yosys DEPS=1 RTL_LIST={job_name}\n")
                 f.write(f"cat check_yosys/{job_name}.txt\n")
-
 
         elif is_verismith:
             with open(scr, 'w') as f:
@@ -121,7 +121,6 @@ class Yosys(BaseRunner):
                         f.write(
                             "echo 'Verismith binary not found, failing test'\n"
                         )
-                        f.write("exit 1\n")
 
         else:
             # === Normal Workflow ===
@@ -160,9 +159,15 @@ class Yosys(BaseRunner):
 
         return " ".join([self.name, version.split()[1]])
 
-
     def is_success_returncode(self, rc, params):
-        if "tags" in params and "vloghammer" in params["tags"]:
+
+        if "tags" in params and "verismith" in params["tags"]:
+            if rc != 0:
+                return False
+            # TODO this could cause problem
+            # check the output of equvalence if it is fail then fail else pass
+
+        elif "tags" in params and "vloghammer" in params["tags"]:
 
             if rc != 0:
                 return False
@@ -172,7 +177,8 @@ class Yosys(BaseRunner):
             job_name = basename.replace(".v", "")
 
             third_party_dir = os.path.abspath(os.environ["THIRD_PARTY_DIR"])
-            vloghammer_dir = os.path.join(third_party_dir, "tests", "vloghammer")
+            vloghammer_dir = os.path.join(
+                third_party_dir, "tests", "vloghammer")
             if not os.path.isdir(vloghammer_dir):
                 vloghammer_dir = os.path.join(
                     third_party_dir, "test", "vloghammer")

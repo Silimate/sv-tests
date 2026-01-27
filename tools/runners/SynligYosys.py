@@ -17,6 +17,7 @@ from BaseRunner import BaseRunner
 
 
 class SynligYosys(BaseRunner):
+
     def __init__(self):
         super().__init__(
             "yosys-synlig", "yosys-synlig",

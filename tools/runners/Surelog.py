@@ -14,6 +14,7 @@ from distutils.util import strtobool
 
 
 class Surelog(BaseRunner):
+
     def __init__(self):
         super().__init__("Surelog", "surelog")
 
