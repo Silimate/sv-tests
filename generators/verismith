@@ -21,6 +21,14 @@ import sys
 
 num_tests = 50
 
+header = """/*
+:name: {test_name}
+:description: Imported Test case from Verismith {i}
+:tags: verismith
+:type: simulation elaboration parsing
+*/
+"""
+
 
 def main():
     try:
@@ -124,7 +132,6 @@ def main():
             print(f"Error generating {filename}: {e}")
             continue
 
-        # Add sv-tests wrapper metadata to the beginning of the file
         if not os.path.exists(filepath):
             print(f"Warning: {filepath} was not created.")
             continue
@@ -132,16 +139,8 @@ def main():
         with open(filepath, "r") as f:
             content = f.read()
 
-        # Simple verification tag
-        header = f"""/*
-:name: {test_name}
-:description: Verismith generated test {i}
-:tags: verismith
-:type: simulation elaboration parsing
-*/
-"""
         with open(filepath, "w") as f:
-            f.write(header + content)
+            f.write(header.format(test_name=test_name, i=i) + content)
 
     print(f"Successfully generated {num_tests} tests in {output_dir}")
 

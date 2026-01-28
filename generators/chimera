@@ -23,9 +23,11 @@ except KeyError:
 run_ChiGen = True
 run_ChiBench = True
 
+num_tests = 100  # 50% for ChiGen & 50% for ChiBench
+
 header_ChiGen = """/*
 :name: {name}
-:description: Imported test case from ChiGen
+:description: Imported test case from ChiGen (Chimera)
 :tags: chimera
 :type: parsing
 */
@@ -33,7 +35,7 @@ header_ChiGen = """/*
 
 header_ChiBench = """/*
 :name: {name}
-:description: Imported test case from ChiBench
+:description: Imported test case from ChiBench (Chimera)
 :tags: chimera
 :type: parsing
 */
@@ -46,7 +48,7 @@ output_dir = os.path.join(tests_dir, 'generated', subdir)
 if (run_ChiBench):
 
     os.makedirs(output_dir, exist_ok=True)
-    limit = 50
+    limit = num_tests // 2
     count = 0
     for f in glob.glob(os.path.join(chimera_root, "3k_programs_for_bugs",
                                     "chibench", '*.v')):
@@ -69,7 +71,7 @@ if (run_ChiBench):
 if (run_ChiGen):
 
     os.makedirs(output_dir, exist_ok=True)
-    limit = 50
+    limit = num_tests // 2
     count = 0
     for f in glob.glob(os.path.join(chimera_root, "3k_programs_for_bugs",
                                     "chigen", '*.v')):
