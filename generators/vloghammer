@@ -26,7 +26,7 @@ import sys
 # Note: :files: metadata is removed/empty because the content is embedded.
 WRAPPER_TEMPLATE = """/*
 :name: {name}
-:description: VlogHammer generated test: {basename}
+:description: Imported Test Case from VlogHammer: {basename}
 :tags: vloghammer
 :type: simulation elaboration parsing
 :top_module: top
@@ -49,6 +49,12 @@ endmodule
 
 {dut_content}
 """
+
+type_test = "gen_samples"  # gen_smaple genrate 300 tests
+# gen_issues  .........................  generate rtl files for known issues
+# gen_samples  ........................  generate small set of autogen rtl files
+# gen_full  ...........................  generate full set of autogen rtl files
+# generate  ...........................  generate all rtl files
 
 
 def parse_verilog_ports(content):
@@ -111,12 +117,11 @@ def main():
 
     try:
         subprocess.check_call(
-            ["make", "gen_samples"
-             ],  # change this to make generate for all tests
+            ["make", type_test],  # change this to make generate for all tests
             cwd=vloghammer_dir,
         )
     except subprocess.CalledProcessError as e:
-        print(f"Error running make gen_samples: {e}")
+        print(f"Error running make {type_test}: {e}")
         sys.exit(1)
 
     rtl_dir = os.path.join(vloghammer_dir, "rtl")
