@@ -181,10 +181,6 @@ def get_verilate_command_sources():
     return sources, incdirs, defines, top_module
 
 
-# Override top module
-top_module = "cva6"
-
-os.chdir(main_path)
 test_dir = os.path.join(tests_dir, 'generated', tests_subdir)
 os.makedirs(test_dir, exist_ok=True)
 
