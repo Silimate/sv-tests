@@ -113,10 +113,9 @@ Finally the file containing the test case and metadata should be placed in `test
 ## Supported closed-source tools (TODO)
 
 ### Parse/Lint
-- [ ] [verific](https://github.com/silimate/verific)
+- [ ] verific
 
 ### Synthesis
-- [ ] [preqorsor](https://github.com/silimate/preqorsor)
 - [ ] [yosys-verific](https://github.com/silimate/yosys)
 
 ## Removed open-source tools
